@@ -10,7 +10,9 @@ const GoogleLoginButton = () => {
   const handleGoogleLogin = async () => {
     try {
       setLoading(true);
-      await signInWithPopup(auth, googleProvider);
+      const result = await signInWithPopup(auth, googleProvider);
+      console.log("Resultado de autenticación:", result.user); // Para debug
+      console.log("Foto de perfil:", result.user.photoURL); // Para debug
     } catch (error) {
       console.error("Error al iniciar sesión con Google:", error);
     } finally {

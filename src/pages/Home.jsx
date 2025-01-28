@@ -12,19 +12,6 @@ export default function Home({ user }) {
     <div className="container">
       <div className="card">
         <h1>Inicio</h1>
-        <div className="profile-header">
-          {user.photoURL && (
-            <img 
-              src={user.photoURL} 
-              alt="Profile" 
-              className="profile-image"
-            />
-          )}
-          <div className="profile-info">
-            <span className="profile-name">{user.displayName}</span>
-            <span className="profile-email">{user.email}</span>
-          </div>
-        </div>
       </div>
 
       <div className="card">

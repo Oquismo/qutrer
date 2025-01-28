@@ -1,0 +1,51 @@
+import React, { useEffect, useState } from "react";
+import { auth } from "./firebase";
+import { onAuthStateChanged } from "firebase/auth";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Navbar from "./components/Navbar";
+import Home from "./pages/Home";
+import Profile from "./pages/Profile";
+import GoogleLoginButton from "./components/GoogleLoginButton";
+
+function App() {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        console.log("Usuario autenticado:", currentUser); // Para debug
+        console.log("Foto de perfil:", currentUser.photoURL); // Para debug
+      }
+      setUser(currentUser);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  if (loading) return <div>Cargando...</div>;
+
+  return (
+    <Router>
+      <div className="App">
+        <Navbar user={user} />
+        {!user ? (
+          <div className="container">
+            <div className="card">
+              <h1>Bienvenido a Twitter Clone</h1>
+              <GoogleLoginButton />
+            </div>
+          </div>
+        ) : (
+          <Routes>
+            <Route path="/" element={<Home user={user} />} />
+            <Route path="/profile" element={<Profile user={user} />} />
+          </Routes>
+        )}
+      </div>
+    </Router>
+  );
+}
+
+export default App;

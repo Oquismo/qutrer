@@ -76,10 +76,31 @@ code {
 }
 
 .profile-image {
-  width: 3rem;
-  height: 3rem;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
-  border: 2px solid #f0f2f5;
+  border: 2px solid #38444d;
+  object-fit: cover;
+  background-color: #1e2732;
+}
+
+.profile-image img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+
+.profile-image-small {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  border: 2px solid #38444d;
+  object-fit: cover;
+}
+
+.profile-image:hover, .profile-image-small:hover {
+  opacity: 0.9;
+  cursor: pointer;
 }
 
 .profile-info {
@@ -156,35 +177,50 @@ code {
 
 .tweet-actions {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around;
+  padding: 0.5rem 0;
+  margin-top: 0.5rem;
+}
+
+.tweet-action-button {
+  display: flex;
   align-items: center;
-}
-
-.char-counter {
-  color: #8899a6;
-  font-size: 0.9rem;
-}
-
-.btn-tweet {
-  background-color: #1d9bf0;
-  color: white;
+  gap: 0.5rem;
+  padding: 0.5rem;
   border-radius: 9999px;
-  padding: 0.75rem 1.5rem;
-  font-weight: 700;
-  font-size: 0.95rem;
-  transition: background-color 0.2s;
   border: none;
+  background: transparent;
+  color: #8899a6;
+  transition: all 0.2s ease;
+  cursor: pointer;
 }
 
-.btn-tweet:hover:not(:disabled) {
-  background-color: #1a8cd8;
+.tweet-action-button:hover {
+  background-color: rgba(29, 155, 240, 0.1);
 }
 
-.btn-tweet:disabled {
-  opacity: 0.5;
+.comment-button:hover {
+  color: #1d9bf0;
 }
 
-/* Nuevos elementos */
+.retweet-button:hover {
+  color: #00ba7c;
+  background-color: rgba(0, 186, 124, 0.1);
+}
+
+.like-button:hover {
+  color: #f91880;
+  background-color: rgba(249, 24, 128, 0.1);
+}
+
+.tweet-action-button.active.retweet-button {
+  color: #00ba7c;
+}
+
+.tweet-action-button.active.like-button {
+  color: #f91880;
+}
+
 .tweet-actions-bar {
   display: flex;
   gap: 1rem;

@@ -1,0 +1,117 @@
+.tweet-form {
+  padding: 1rem;
+  border-bottom: 1px solid #2f3336;
+}
+
+.tweet-form-container {
+  display: flex;
+  gap: 12px;
+}
+
+.profile-container {
+  position: relative;
+}
+
+.profile-image {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+}
+
+.tweet-content {
+  flex: 1;
+}
+
+.tweet-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 1.2rem;
+  outline: none;
+  resize: none;
+  margin-bottom: 1rem;
+}
+
+.tweet-actions-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 0.5rem;
+  border-top: 1px solid #2f3336;
+}
+
+.tweet-actions-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.action-button {
+  background: none;
+  border: none;
+  color: #1d9bf0;
+  padding: 8px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.action-button:hover {
+  background-color: rgba(29, 155, 240, 0.1);
+}
+
+.tweet-submit-section {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  margin: 20px;
+  
+}
+
+.char-counter {
+  color: #71767b;
+  font-size: 0.9rem;
+}
+
+.counter-limit {
+  color: #f4212e;
+}
+
+.tweet-submit-button {
+  background-color: #1d9bf0;
+  color: white;
+  font-weight: bold;
+  padding: 10px 20px;
+  border-radius: 9999px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 15px;
+  min-width: 80px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 5px rgba(29, 155, 240, 0.2);
+}
+
+.tweet-submit-button:hover {
+  background-color: #1a91da;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(29, 155, 240, 0.3);
+}
+
+.tweet-submit-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(29, 155, 240, 0.2);
+}
+
+.button-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: #6e767d;
+  box-shadow: none;
+}
+
+.button-disabled:hover {
+  background-color: #6e767d;
+  transform: none;
+  box-shadow: none;
+}

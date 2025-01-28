@@ -10,6 +10,7 @@
     "@tailwindcss/postcss": "^4.0.0",
     "@tailwindcss/vite": "^4.0.0",
     "cra-template": "1.2.0",
+    "date-fns": "^2.30.0",
     "firebase": "^11.2.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
