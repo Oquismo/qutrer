@@ -17,7 +17,7 @@ export default function Home({ user }) {
       <div className="card">
         <TweetForm user={user} />
         <div className="divider">
-          <TweetList />
+          <TweetList currentUser={user} />
         </div>
       </div>
     </div>

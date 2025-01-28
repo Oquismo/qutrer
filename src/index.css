@@ -21,12 +21,15 @@ code {
   padding: 1rem;
 }
 
-/* Componentes */
+/* Navegación */
 .navbar {
   background-color: rgba(21, 32, 43, 0.95);
   border-bottom: 1px solid #38444d;
   padding: 1rem;
   backdrop-filter: blur(12px);
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
 .navbar-content {
@@ -37,34 +40,72 @@ code {
   align-items: center;
 }
 
+/* Enlaces de navegación */
 .nav-links {
   display: flex;
   gap: 1rem;
 }
 
 .nav-link {
-  font-weight: 600;
-  text-decoration: none;
   color: #e7e9ea;
-  transition: color 0.2s;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s ease;
 }
 
 .nav-link:hover {
   color: #1d9bf0;
 }
 
+/* Botones */
+.btn {
+  padding: 10px 20px;
+  border-radius: 9999px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.95rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary {
+  background-color: #1da1f2;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.btn-primary:hover {
+  background-color: #1a91da;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+}
+
+.btn-danger {
+  background-color: #dc3545;
+  color: white;
+}
+
+.btn-danger:hover {
+  background-color: #c82333;
+}
+
 /* Tarjetas */
 .card {
   background-color: #1e2732;
   border: 1px solid #38444d;
-  border-radius: 16px;
-  padding: 1rem;
+  border-radius: 24px;
+  padding: 1.25rem;
   margin-bottom: 1rem;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .card:hover {
   background-color: #22303c;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
 /* Perfil de usuario */
@@ -79,9 +120,10 @@ code {
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  border: 2px solid #38444d;
+  border: 3px solid #38444d;
   object-fit: cover;
   background-color: #1e2732;
+  transition: all 0.2s ease;
 }
 
 .profile-image img {
@@ -91,8 +133,8 @@ code {
 }
 
 .profile-image-small {
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   border: 2px solid #38444d;
   object-fit: cover;
@@ -101,6 +143,11 @@ code {
 .profile-image:hover, .profile-image-small:hover {
   opacity: 0.9;
   cursor: pointer;
+}
+
+.profile-image:hover {
+  border-color: #1da1f2;
+  transform: scale(1.05);
 }
 
 .profile-info {
@@ -145,6 +192,22 @@ code {
   background-color: #c82333;
 }
 
+/* Botón de borrar tweet */
+.delete-tweet-btn {
+  opacity: 0.8;
+  transform: scale(1);
+  will-change: transform;
+}
+
+.delete-tweet-btn:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.delete-tweet-btn:active {
+  transform: scale(0.95);
+}
+
 /* Divisores */
 .divider {
   border-top: 1px solid #e5e7eb;
@@ -153,72 +216,69 @@ code {
 
 /* Tweet Form */
 .tweet-form {
-  background-color: #1e2732;
+  background-color: transparent;
   border-bottom: 1px solid #2f3336;
-  border-radius: 16px;
-  padding: 1rem;
+  border-radius: 24px;
+  padding: 1.25rem;
 }
 
 .tweet-input {
-  background-color: transparent;
-  border: none;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid #38444d;
+  border-radius: 16px;
   color: #e7e9ea;
   font-size: 1.25rem;
   width: 100%;
+  min-height: 80px;
   resize: none;
-  margin-bottom: 1rem;
-  padding: 12px;
+  margin-bottom: 0.75rem;
+  padding: 16px;
   outline: none;
+  transition: all 0.2s ease;
 }
 
 .tweet-input::placeholder {
   color: #8899a6;
 }
 
+.tweet-input:focus {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: #1da1f2;
+  box-shadow: 0 0 0 2px rgba(29, 161, 242, 0.2);
+}
+
 .tweet-actions {
   display: flex;
   justify-content: space-around;
-  padding: 0.5rem 0;
-  margin-top: 0.5rem;
+  padding: 8px 0;
 }
 
 .tweet-action-button {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem;
-  border-radius: 9999px;
+  gap: 8px;
+  padding: 8px;
+  border-radius: 50%;
   border: none;
   background: transparent;
   color: #8899a6;
-  transition: all 0.2s ease;
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.tweet-action-button:hover {
+.tweet-action-button:hover.comment-button {
+  color: #1d9bf0;
   background-color: rgba(29, 155, 240, 0.1);
 }
 
-.comment-button:hover {
-  color: #1d9bf0;
-}
-
-.retweet-button:hover {
+.tweet-action-button:hover.retweet-button {
   color: #00ba7c;
   background-color: rgba(0, 186, 124, 0.1);
 }
 
-.like-button:hover {
+.tweet-action-button:hover.like-button {
   color: #f91880;
   background-color: rgba(249, 24, 128, 0.1);
-}
-
-.tweet-action-button.active.retweet-button {
-  color: #00ba7c;
-}
-
-.tweet-action-button.active.like-button {
-  color: #f91880;
 }
 
 .tweet-actions-bar {
@@ -244,4 +304,39 @@ code {
 .action-button:hover {
   color: #1d9bf0;
   background-color: rgba(29, 155, 240, 0.1);
+}
+
+/* Animaciones */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Efectos de hover y transiciones */
+.transform {
+  transition-property: transform;
+}
+
+.hover\:scale-105:hover {
+  transform: scale(1.05);
+}
+
+.transition-all {
+  transition-property: all;
+}
+
+.duration-200 {
+  transition-duration: 200ms;
+}
+
+.ease-in-out {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
