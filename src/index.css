@@ -1,4 +1,3 @@
-
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -6,9 +5,207 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: #15202b;
+  color: #e7e9ea;
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+/* Contenedores */
+.container {
+  max-width: 42rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+/* Componentes */
+.navbar {
+  background-color: rgba(21, 32, 43, 0.95);
+  border-bottom: 1px solid #38444d;
+  padding: 1rem;
+  backdrop-filter: blur(12px);
+}
+
+.navbar-content {
+  max-width: 42rem;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav-links {
+  display: flex;
+  gap: 1rem;
+}
+
+.nav-link {
+  font-weight: 600;
+  text-decoration: none;
+  color: #e7e9ea;
+  transition: color 0.2s;
+}
+
+.nav-link:hover {
+  color: #1d9bf0;
+}
+
+/* Tarjetas */
+.card {
+  background-color: #1e2732;
+  border: 1px solid #38444d;
+  border-radius: 16px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  transition: background-color 0.2s;
+}
+
+.card:hover {
+  background-color: #22303c;
+}
+
+/* Perfil de usuario */
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.profile-image {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  border: 2px solid #f0f2f5;
+}
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-name {
+  font-weight: 700;
+  color: #e7e9ea;
+}
+
+.profile-email {
+  font-size: 0.875rem;
+  color: #8899a6;
+}
+
+/* Botones */
+.btn {
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.btn-primary {
+  background-color: #1da1f2;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #1a91da;
+}
+
+.btn-danger {
+  background-color: #dc3545;
+  color: white;
+}
+
+.btn-danger:hover {
+  background-color: #c82333;
+}
+
+/* Divisores */
+.divider {
+  border-top: 1px solid #e5e7eb;
+  margin: 1rem 0;
+}
+
+/* Tweet Form */
+.tweet-form {
+  background-color: #1e2732;
+  border-bottom: 1px solid #2f3336;
+  border-radius: 16px;
+  padding: 1rem;
+}
+
+.tweet-input {
+  background-color: transparent;
+  border: none;
+  color: #e7e9ea;
+  font-size: 1.25rem;
+  width: 100%;
+  resize: none;
+  margin-bottom: 1rem;
+  padding: 12px;
+  outline: none;
+}
+
+.tweet-input::placeholder {
+  color: #8899a6;
+}
+
+.tweet-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.char-counter {
+  color: #8899a6;
+  font-size: 0.9rem;
+}
+
+.btn-tweet {
+  background-color: #1d9bf0;
+  color: white;
+  border-radius: 9999px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 700;
+  font-size: 0.95rem;
+  transition: background-color 0.2s;
+  border: none;
+}
+
+.btn-tweet:hover:not(:disabled) {
+  background-color: #1a8cd8;
+}
+
+.btn-tweet:disabled {
+  opacity: 0.5;
+}
+
+/* Nuevos elementos */
+.tweet-actions-bar {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+  padding: 0.5rem 0;
+  border-top: 1px solid #38444d;
+}
+
+.action-button {
+  background: transparent;
+  border: none;
+  color: #8899a6;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 9999px;
+  transition: all 0.2s;
+}
+
+.action-button:hover {
+  color: #1d9bf0;
+  background-color: rgba(29, 155, 240, 0.1);
 }
