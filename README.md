@@ -33,4 +33,8 @@ Este es un clon de Twitter desarrollado con tecnologías modernas para ofrecer u
 ```bash
 git clone https://github.com/Oquismo/twitter-clone.git
 cd twitter-clone
+## 🤝 Contribuciones
 
+¡Las contribuciones son más que bienvenidas! 🙌
+
+Si encuentras un error, tienes una idea para mejorar el proyecto o deseas añadir nuevas funcionalidades
