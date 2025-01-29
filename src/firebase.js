@@ -1,9 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
-import { getFirestore, deleteDoc, doc } from "firebase/firestore";
+import { getFirestore, deleteDoc, doc, getDoc } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
-
-
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -24,10 +22,31 @@ export const googleProvider = new GoogleAuthProvider();
 export const db = getFirestore(app);
 export const storage = getStorage(app);
 
-export const deleteTweet = async (tweetId) => {
+// Constante para el ID del administrador
+export const ADMIN_UID = "ahYDXI6ylmcvRLMUxAEcZ0NvH483";
+
+// Función para verificar si un usuario es administrador
+export const isUserAdmin = (uid) => {
+  return uid === ADMIN_UID;
+};
+
+// Función mejorada para borrar tweets que verifica permisos
+export const deleteTweet = async (tweetId, currentUser) => {
   try {
+    if (!currentUser) throw new Error("Usuario no autenticado");
+    
+    // Obtener el tweet
     const tweetRef = doc(db, "tweets", tweetId);
-    await deleteDoc(tweetRef);
+    const tweetDoc = await getDoc(tweetRef);
+    
+    if (!tweetDoc.exists()) throw new Error("Tweet no encontrado");
+    
+    // Verificar permisos
+    if (tweetDoc.data().userId === currentUser.uid || isUserAdmin(currentUser.uid)) {
+      await deleteDoc(tweetRef);
+    } else {
+      throw new Error("No tienes permiso para borrar este tweet");
+    }
   } catch (error) {
     console.error("Error al eliminar el tweet:", error);
     throw error;
