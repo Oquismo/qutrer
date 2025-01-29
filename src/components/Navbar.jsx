@@ -1,4 +1,3 @@
-// src/components/Navbar.jsx
 import React from "react";
 import { Link } from "react-router-dom";
 import { auth } from "../firebase";
@@ -11,6 +10,7 @@ export default function Navbar({ user }) {
           <Link to="/" className="nav-link">Inicio</Link>
           <Link to="/profile" className="nav-link">Perfil</Link>
         </div>
+
         {user && (
           <button 
             onClick={() => auth.signOut()}

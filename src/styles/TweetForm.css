@@ -144,3 +144,44 @@
   height: 20px;
   margin-right: 8px;
 }
+
+@media (max-width: 768px) {
+  .tweet-form {
+    padding: 0.5rem;
+  }
+
+  .tweet-form-container {
+    gap: 8px;
+  }
+
+  .tweet-submit-section {
+    margin: 10px;
+    gap: 15px;
+  }
+
+  .tweet-submit-button {
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .tweet-content {
+    width: 100%;
+  }
+
+  .tweet-input {
+    font-size: 1rem;
+    padding: 8px;
+  }
+
+  .tweet-actions-bar {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .tweet-submit-section {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+}

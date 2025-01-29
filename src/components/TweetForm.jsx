@@ -28,6 +28,7 @@ export default function TweetForm({ user }) {
     setIsPosting(true);
     try {
       console.log("Usuario actual:", user); // Para debug
+
       await addDoc(collection(db, "tweets"), {
         text: tweetText,
         userId: user.uid,
@@ -37,6 +38,7 @@ export default function TweetForm({ user }) {
         likes: 0,
         retweets: 0,
       });
+
       setTweetText("");
     } catch (error) {
       console.error("Error al publicar tweet:", error);
@@ -77,43 +79,18 @@ export default function TweetForm({ user }) {
             style={{ minHeight: '50px' }}
             maxLength={280}
           />
-          
+
           <div className="tweet-actions-bar">
-            <div className="tweet-actions-buttons">
-              <button className="action-button">
-                
-              </button>
-              <button className="action-button">
-                
-              </button>
-              <button className="action-button">
-                
-              </button>
-              <button className="action-button">
-               
-              </button>
-            </div>
-            
             <div className="tweet-submit-section">
               <span className={`char-counter ${isOverLimit ? 'counter-limit' : ''}`}>
-                {charRemaining} caracteres restantes--
+                {charRemaining} caracteres restantes
               </span>
               <button 
                 type="submit" 
                 disabled={isPosting || !tweetText.trim() || isOverLimit}
                 className="tweet-submit-button"
               >
-                {isPosting ? (
-                  <>
-                    <svg className="loading-spinner" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-                    </svg>
-                    <span>Posteando...</span>
-                  </>
-                ) : (
-                  <span>Postear</span>
-                )}
+                {isPosting ? "Posteando..." : "Postear"}
               </button>
             </div>
           </div>
