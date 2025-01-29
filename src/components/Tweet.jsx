@@ -48,7 +48,7 @@ export default function Tweet({ tweet, currentUser }) {
                 onClick={(e) => e.stopPropagation()}
               >
                 <span className="font-bold text-white">
-                  {tweet.username}
+                  {tweet.username?.split('@')[0] || 'Usuario'}
                 </span>
               </Link>
               <span className="text-gray-500">·</span>
@@ -90,7 +90,7 @@ export default function Tweet({ tweet, currentUser }) {
                     xmlns="http://www.w3.org/2000/svg"
                     className="w-5 h-5 text-yellow-500"
                   >
-                    <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 6c1.4 0 2.5 1.1 2.5 2.5S13.4 12 12 12s-2.5-1.1-2.5-2.5S10.6 7 12 7zm0 6.5c2.33 0 4.3 1.46 5.11 3.5H6.89c.8-2.04 2.78-3.5 5.11-3.5z"/>
+                    <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 6c1.4 0 2.5 1.1 2.5 2.5S13.4 12 12 12s-2.5-1.1 2.5-2.5S10.6 7 12 7zm0 6.5c2.33 0 4.3 1.46 5.11 3.5H6.89c.8-2.04 2.78-3.5 5.11-3.5z"/>
                   </svg>
                 </button>
               )}

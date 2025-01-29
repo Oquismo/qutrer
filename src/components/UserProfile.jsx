@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { db } from '../firebase';
+import { useParams, useNavigate } from 'react-router-dom';
+import { db, auth } from '../firebase';
 import { doc, getDoc, collection, query, where, getDocs, orderBy } from 'firebase/firestore';
 
 const UserProfile = () => {
   const { userId } = useParams();
+  const navigate = useNavigate();
   const [userProfile, setUserProfile] = useState(null);
   const [userTweets, setUserTweets] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -15,12 +16,13 @@ const UserProfile = () => {
       if (!userId) return;
 
       try {
-        // Primero intentamos obtener el perfil de la colección 'tweets'
+        console.log('Buscando perfil para userId:', userId);
+
+        // Primero, buscar en la colección de tweets para obtener la información del usuario
         const tweetsQuery = query(
           collection(db, 'tweets'),
           where('userId', '==', userId),
-          orderBy('timestamp', 'desc'),
-          where('username', '!=', null)
+          orderBy('timestamp', 'desc')
         );
         
         const tweetsSnapshot = await getDocs(tweetsQuery);
@@ -29,22 +31,18 @@ const UserProfile = () => {
           ...doc.data()
         }));
         
+        console.log('Tweets encontrados:', tweets.length);
+
         if (tweets.length > 0) {
-          const lastTweet = tweets[0];
+          const userInfo = tweets[0];
           setUserProfile({
-            displayName: lastTweet.username,
-            photoURL: lastTweet.userImage,
-            userId: lastTweet.userId,
+            displayName: userInfo.username,
+            photoURL: userInfo.userImage,
+            userId: userInfo.userId
           });
           setUserTweets(tweets);
-        } else {
-          // Si no hay tweets, intentamos obtener el perfil de la colección 'users'
-          const userDoc = await getDoc(doc(db, 'users', userId));
-          if (userDoc.exists()) {
-            setUserProfile(userDoc.data());
-          }
         }
-        
+
       } catch (error) {
         console.error('Error al obtener el perfil:', error);
         setError("Error al cargar el perfil");
@@ -93,8 +91,10 @@ const UserProfile = () => {
             }}
           />
           <div>
-            <h2 className="text-xl font-bold">{userProfile.displayName}</h2>
-            <p className="text-gray-400">@{userProfile.username || userProfile.displayName}</p>
+            <h2 className="text-xl font-bold">
+              {userProfile.displayName || userProfile.email?.split('@')[0]}
+            </h2>
+            <p className="text-gray-400">@{userProfile.username?.split('@')[0] || userProfile.displayName?.split('@')[0]}</p>
           </div>
         </div>
       </div>

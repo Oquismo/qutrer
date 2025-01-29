@@ -71,7 +71,7 @@ export default function Profile({ currentUser }) {
             {/* Nombre y username */}
             <div className="mb-4">
               <h1 className="text-xl font-bold text-white">
-                {profileUser.displayName || "Usuario"}
+                {profileUser.displayName || profileUser.email?.split('@')[0]}
               </h1>
               <p className="text-gray-500">@{profileUser.email?.split('@')[0]}</p>
             </div>

@@ -31,7 +31,7 @@ export default function TweetForm({ user }) {
       await addDoc(collection(db, "tweets"), {
         text: tweetText,
         userId: user.uid,
-        username: user.displayName || user.email,
+        username: user.displayName || user.email?.split('@')[0] || 'Usuario',
         userImage: user.photoURL,
         timestamp: serverTimestamp(),
         likes: 0,
