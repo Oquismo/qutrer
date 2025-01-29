@@ -115,3 +115,32 @@
   transform: none;
   box-shadow: none;
 }
+
+.tweet-submit-button {
+  background-color: #1da1f2;
+  color: white;
+  font-weight: bold;
+  padding: 8px 24px;
+  border-radius: 9999px;
+  border: none;
+  transition: background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tweet-submit-button:hover {
+  background-color: #1a91da;
+}
+
+.tweet-submit-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.tweet-submit-button .loading-spinner {
+  animation: spin 1s linear infinite;
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+}

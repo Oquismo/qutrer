@@ -7,6 +7,7 @@ import Profile from "./pages/Profile";
 import Navbar from "./components/Navbar";
 import GoogleLoginButton from "./components/GoogleLoginButton";
 
+
 export default function App() {
   const { user, loading } = useAuth();
 
@@ -17,7 +18,7 @@ export default function App() {
   if (!user) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-        <h1 className="text-2xl mb-4">Bienvenido a Twitter Clone</h1>
+        
         <GoogleLoginButton />
       </div>
     );

@@ -2,7 +2,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { db } from "../firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
-// import { IoImageOutline, IoBarChartOutline, IoHappyOutline, IoCalendarOutline } from "react-icons/io5";
+import '../styles/TweetForm.css';
 
 const MAX_TWEET_LENGTH = 280;
 const DEFAULT_PROFILE_IMAGE = "https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png";
@@ -98,12 +98,22 @@ export default function TweetForm({ user }) {
               <span className={`char-counter ${isOverLimit ? 'counter-limit' : ''}`}>
                 {charRemaining} caracteres restantes--
               </span>
-              <button
-                type="submit"
+              <button 
+                type="submit" 
                 disabled={isPosting || !tweetText.trim() || isOverLimit}
-                className={`tweet-submit-button ${(isPosting || !tweetText.trim() || isOverLimit) ? 'button-disabled' : ''}`}
+                className="tweet-submit-button"
               >
-                {isPosting ? 'Publicando...' : 'Postear'}
+                {isPosting ? (
+                  <>
+                    <svg className="loading-spinner" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                    </svg>
+                    <span>Posteando...</span>
+                  </>
+                ) : (
+                  <span>Postear</span>
+                )}
               </button>
             </div>
           </div>

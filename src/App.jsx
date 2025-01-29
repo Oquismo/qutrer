@@ -6,6 +6,7 @@ import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import Profile from "./pages/Profile";
 import GoogleLoginButton from "./components/GoogleLoginButton";
+import "./styles/App.css";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -24,7 +25,7 @@ function App() {
     return () => unsubscribe();
   }, []);
 
-  if (loading) return <div>Cargando...</div>;
+  if (loading) return <div className="loading-screen">Cargando...</div>;
 
   return (
     <Router>
@@ -32,10 +33,7 @@ function App() {
         <Navbar user={user} />
         {!user ? (
           <div className="container">
-            <div className="card">
-              <h1>Bienvenido a Twitter Clone</h1>
-              <GoogleLoginButton />
-            </div>
+            <GoogleLoginButton />
           </div>
         ) : (
           <Routes>

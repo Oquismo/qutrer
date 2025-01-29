@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { auth, googleProvider, registerWithEmailAndPassword, loginWithEmailAndPassword } from "../firebase";
 import { signInWithPopup } from "firebase/auth";
+import '../styles/auth.css';  // Añadir esta línea
 
 const GoogleLoginButton = () => {
   const [loading, setLoading] = useState(false);
@@ -39,30 +40,33 @@ const GoogleLoginButton = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto p-6">
-      <h2 className="text-2xl font-bold text-center mb-8 text-white">
+    <div className="auth-container">
+      <div className="welcome-header flex justify-center w-full">
+        <h1 className="welcome-title text-center text-2xl font-bold my-6">Bienvenido</h1>
+        {/* <p className="welcome-subtitle">Lo que está pasando ahora</p> */}
+      </div>
+
+      <h2 className="auth-header">
         {isRegistering ? "Crear una cuenta" : "Iniciar sesión"}
       </h2>
 
-      <form onSubmit={handleEmailAuth} className="space-y-4">
-        <div>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Correo electrónico"
-            className="auth-input"
-          />
-        </div>
-        <div>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Contraseña"
-            className="auth-input"
-          />
-        </div>
+      <form onSubmit={handleEmailAuth} className="auth-form">
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="Correo electrónico"
+          className="auth-input"
+          autoComplete="email"
+        />
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Contraseña"
+          className="auth-input"
+          autoComplete="current-password"
+        />
         <button
           type="submit"
           disabled={loading}
@@ -84,16 +88,16 @@ const GoogleLoginButton = () => {
 
       <button
         onClick={() => setIsRegistering(!isRegistering)}
-        className="w-full text-center py-3 text-blue-400 hover:text-blue-500 mt-4 transition-all duration-200 font-medium border border-transparent hover:border-blue-500/20 rounded-full"
+        className="auth-toggle-btn"
       >
         {isRegistering 
-          ? "¿Ya tienes cuenta? Inicia sesión" 
-          : "¿No tienes cuenta? Regístrate"}
+          ? "← ¿Ya tienes cuenta? Inicia sesión" 
+          : "✨ ¿No tienes cuenta? Regístrate"}
       </button>
 
-      <div className="relative flex items-center justify-center my-6">
+      <div className="relative flex items-center justify-center my-4">
         <hr className="w-full border-gray-600" />
-        <span className="absolute bg-[#15202b] px-4 text-gray-500">o</span>
+        <span className="absolute bg-[#1e2732] px-4 text-gray-500"></span>
       </div>
 
       <button 
