@@ -306,6 +306,74 @@ code {
   background-color: rgba(29, 155, 240, 0.1);
 }
 
+/* Estilos para la autenticación */
+.auth-input {
+  width: 100%;
+  padding: 12px 16px;
+  background-color: #253341;
+  border: 1px solid #38444d;
+  border-radius: 16px;
+  color: #fff;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.auth-input:focus {
+  border-color: #1da1f2;
+  background-color: #2c3c4c;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(29, 161, 242, 0.2);
+}
+
+.auth-submit-btn {
+  width: 100%;
+  padding: 12px;
+  background-color: #1da1f2;
+  color: white;
+  border: none;
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.auth-submit-btn:hover {
+  background-color: #1a91da;
+  transform: translateY(-1px);
+}
+
+.auth-submit-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.google-auth-btn {
+  width: 100%;
+  padding: 12px;
+  background-color: #fff;
+  color: #000;
+  border: none;
+  border-radius: 9999px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.google-auth-btn:hover {
+  background-color: #f8f9fa;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.google-auth-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
 /* Animaciones */
 @keyframes spin {
   from {
