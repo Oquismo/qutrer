@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './styles/index.css';
+import './index.css';  // Asegúrate de que esta línea exista
 import App from './App';
 import { AuthProvider } from './context/AuthContext';
 import reportWebVitals from './reportWebVitals';

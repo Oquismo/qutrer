@@ -40,7 +40,7 @@ const GoogleLoginButton = () => {
   };
 
   return (
-    <div className="auth-container">
+    <div className="auth-container bg-[#15202B]">
       <div className="welcome-header flex justify-center w-full">
         <h1 className="welcome-title text-center text-2xl font-bold my-6">Bienvenido</h1>
         {/* <p className="welcome-subtitle">Lo que está pasando ahora</p> */}
@@ -97,7 +97,7 @@ const GoogleLoginButton = () => {
 
       <div className="relative flex items-center justify-center my-4">
         <hr className="w-full border-gray-600" />
-        <span className="absolute bg-[#1e2732] px-4 text-gray-500"></span>
+        <span className="absolute bg-[#15202B] px-4 text-gray-500"></span>
       </div>
 
       <button 

@@ -27,7 +27,7 @@ export default function TweetList({ currentUser }) {
   }, []);
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col divide-y divide-gray-800">
       {tweets.map((tweet) => (
         <Tweet 
           key={tweet.id} 

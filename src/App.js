@@ -6,6 +6,8 @@ import Home from "./pages/Home";
 import Profile from "./pages/Profile";
 import Navbar from "./components/Navbar";
 import GoogleLoginButton from "./components/GoogleLoginButton";
+import './styles/index.css';
+
 
 
 export default function App() {
@@ -30,7 +32,8 @@ export default function App() {
         <Navbar user={user} />
         <Routes>
           <Route path="/" element={<Home user={user} />} />
-          <Route path="/profile" element={<Profile user={user} />} />
+          <Route path="/profile" element={<Profile currentUser={user} />} />
+          <Route path="/profile/:userId" element={<Profile currentUser={user} />} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </div>

@@ -6,6 +6,7 @@ import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import Profile from "./pages/Profile";
 import GoogleLoginButton from "./components/GoogleLoginButton";
+import UserProfile from "./components/UserProfile";
 import "./styles/App.css";
 
 function App() {
@@ -29,7 +30,7 @@ function App() {
 
   return (
     <Router>
-      <div className="App">
+      <div className="min-h-screen bg-[#15202B]">
         <Navbar user={user} />
         {!user ? (
           <div className="container">
@@ -39,6 +40,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Home user={user} />} />
             <Route path="/profile" element={<Profile user={user} />} />
+            <Route path="/profile/:userId" element={<UserProfile />} />
           </Routes>
         )}
       </div>
