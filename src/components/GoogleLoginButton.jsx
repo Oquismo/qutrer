@@ -1,7 +1,8 @@
 // src/components/GoogleLoginButton.jsx
 import React, { useState } from "react";
-import { auth, googleProvider, registerWithEmailAndPassword, loginWithEmailAndPassword } from "../firebase";
+import { auth, googleProvider, db, registerWithEmailAndPassword, loginWithEmailAndPassword } from "../firebase";
 import { signInWithPopup } from "firebase/auth";
+import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
 import '../styles/auth.css';  // Añadir esta línea
 
 const GoogleLoginButton = () => {
@@ -16,6 +17,22 @@ const GoogleLoginButton = () => {
       const result = await signInWithPopup(auth, googleProvider);
       console.log("Resultado de autenticación:", result.user); // Para debug
       console.log("Foto de perfil:", result.user.photoURL); // Para debug
+
+      // Crear o actualizar documento de usuario
+      const userRef = doc(db, "users", result.user.uid);
+      const userDoc = await getDoc(userRef);
+
+      if (!userDoc.exists()) {
+        await setDoc(userRef, {
+          uid: result.user.uid,
+          email: result.user.email,
+          displayName: result.user.displayName || result.user.email?.split('@')[0],
+          photoURL: result.user.photoURL,
+          followers: [],
+          following: [],
+          createdAt: serverTimestamp()
+        });
+      }
     } catch (error) {
       console.error("Error al iniciar sesión con Google:", error);
     } finally {

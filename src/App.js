@@ -7,6 +7,7 @@ import Profile from "./pages/Profile";
 import Navbar from "./components/Navbar";
 import GoogleLoginButton from "./components/GoogleLoginButton";
 import './styles/index.css';
+import TweetDetail from "./pages/TweetDetail";
 
 
 
@@ -34,6 +35,7 @@ export default function App() {
           <Route path="/" element={<Home user={user} />} />
           <Route path="/profile" element={<Profile currentUser={user} />} />
           <Route path="/profile/:userId" element={<Profile currentUser={user} />} />
+          <Route path="/tweet/:tweetId" element={<TweetDetail currentUser={user} />} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </div>
