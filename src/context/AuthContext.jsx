@@ -8,6 +8,7 @@ const AuthContext = createContext();
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (authUser) => {
@@ -52,12 +53,17 @@ export function AuthProvider({ children }) {
               setUser({ ...authUser, ...existingData });
             }
           }
+
+          // Verificar si el usuario es administrador
+          const adminDoc = await getDoc(doc(db, "admins", authUser.uid));
+          setIsAdmin(adminDoc.exists());
         } catch (error) {
           console.error("Error initializing user:", error);
           setUser(authUser);
         }
       } else {
         setUser(null);
+        setIsAdmin(false);
       }
       setLoading(false);
     });
@@ -65,7 +71,7 @@ export function AuthProvider({ children }) {
     return () => unsubscribe();
   }, []);
 
-  const value = useMemo(() => ({ user, loading }), [user, loading]);
+  const value = useMemo(() => ({ user, loading, isAdmin }), [user, loading, isAdmin]);
 
   return (
     <AuthContext.Provider value={value}>

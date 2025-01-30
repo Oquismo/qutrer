@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
 import Tweet from '../components/Tweet';
+import AdminIcon from '../components/AdminIcon';
 
 export default function TweetDetail({ currentUser }) {
   const { tweetId } = useParams();
@@ -71,6 +72,7 @@ export default function TweetDetail({ currentUser }) {
           currentUser={currentUser} 
           isDetail={true}
         />
+        {currentUser?.isAdmin && <AdminIcon />}
       </div>
     </div>
   );

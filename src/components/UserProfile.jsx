@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { db, auth } from '../firebase';
 import { doc, getDoc, collection, query, where, getDocs, orderBy } from 'firebase/firestore';
+import { useAuth } from "../context/AuthContext";
+import AdminIcon from "./AdminIcon";
 
 const UserProfile = () => {
   const { userId } = useParams();
@@ -10,6 +12,7 @@ const UserProfile = () => {
   const [userTweets, setUserTweets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { isAdmin } = useAuth();
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -92,7 +95,7 @@ const UserProfile = () => {
           />
           <div>
             <h2 className="text-xl font-bold">
-              {userProfile.displayName || userProfile.email?.split('@')[0]}
+              {userProfile.displayName || userProfile.email?.split('@')[0]} {isAdmin && <AdminIcon />}
             </h2>
             <p className="text-gray-400">@{userProfile.username?.split('@')[0] || userProfile.displayName?.split('@')[0]}</p>
           </div>

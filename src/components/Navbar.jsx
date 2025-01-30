@@ -1,8 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { auth } from "../firebase";
+import { useAuth } from "../context/AuthContext";
+import AdminIcon from "./AdminIcon";
 
-export default function Navbar({ user }) {
+export default function Navbar() {
+  const { user, isAdmin } = useAuth();
+
   return (
     <nav className="sticky top-0 z-50 bg-[#15202B] border-b border-gray-800">
       <div className="max-w-2xl mx-auto">
@@ -19,7 +23,7 @@ export default function Navbar({ user }) {
                 to={`/profile/${user.uid}`}
                 className="text-gray-200 hover:text-white px-4 py-2 text-base font-medium rounded-full hover:bg-gray-800 transition-colors"
               >
-                Mi Perfil
+                Mi Perfil {isAdmin && <AdminIcon />}
               </Link>
             )}
           </div>
