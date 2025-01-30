@@ -1,18 +1,23 @@
-import React from "react";
+import React, { useState } from "react";
 import { formatDistance } from "date-fns";
 import { es } from "date-fns/locale";
 import { useNavigate, Link } from "react-router-dom";
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../firebase';
 import TweetActions from "./TweetActions";
 import FollowButton from './FollowButton';
 import { deleteTweet, isUserAdmin } from "../firebase";
 import { ReactComponent as AdminIcon } from '../icons/progress-check.svg';
+import { useAuth } from '../context/AuthContext';
 
 const DEFAULT_PROFILE_IMAGE = "https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png";
 
-export default React.memo(function Tweet({ tweet, currentUser, isDetail = false }) {
+export default React.memo(function Tweet({ tweet: initialTweet, currentUser, isDetail = false }) {
+  const [tweet, setTweet] = useState(initialTweet);
   const timestamp = tweet.timestamp?.toDate();
   const [isAdmin, setIsAdmin] = React.useState(false);
   const navigate = useNavigate();
+  const { user: authUser } = useAuth();
   
   React.useEffect(() => {
     const checkAdmin = async () => {
@@ -20,6 +25,31 @@ export default React.memo(function Tweet({ tweet, currentUser, isDetail = false 
       setIsAdmin(adminStatus);
     };
     checkAdmin();
+  }, [tweet.userId]);
+
+  React.useEffect(() => {
+    if (authUser?.uid === tweet.userId && authUser?.photoURL) {
+      setTweet((prevTweet) => ({
+        ...prevTweet,
+        userImage: authUser.photoURL,
+      }));
+    }
+  }, [authUser, tweet.userId]);
+
+  React.useEffect(() => {
+    const fetchUserImage = async () => {
+      const userRef = doc(db, "users", tweet.userId);
+      const userDoc = await getDoc(userRef);
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        setTweet((prevTweet) => ({
+          ...prevTweet,
+          userImage: userData.photoURL || DEFAULT_PROFILE_IMAGE,
+        }));
+      }
+    };
+
+    fetchUserImage();
   }, [tweet.userId]);
 
   const handleDelete = React.useCallback(async () => {

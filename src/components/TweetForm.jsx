@@ -2,6 +2,7 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { db } from "../firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { useAuth } from '../context/AuthContext';
 
 const MAX_TWEET_LENGTH = 280;
 const DEFAULT_PROFILE_IMAGE = "https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png";
@@ -11,14 +12,15 @@ export default React.memo(function TweetForm({ user }) {
   const [isPosting, setIsPosting] = useState(false);
   const [profileImg, setProfileImg] = useState(DEFAULT_PROFILE_IMAGE);
   const textareaRef = useRef(null);
+  const { user: authUser } = useAuth();
 
   useEffect(() => {
     // Verifica y actualiza la imagen de perfil cuando el usuario cambia
-    if (user?.photoURL) {
-      console.log("URL de foto de perfil:", user.photoURL); // Para debug
-      setProfileImg(user.photoURL);
+    if (authUser?.photoURL) {
+      console.log("URL de foto de perfil:", authUser.photoURL); // Para debug
+      setProfileImg(authUser.photoURL);
     }
-  }, [user]);
+  }, [authUser]);
 
   const handleSubmit = useCallback(async (e) => {
     e.preventDefault();

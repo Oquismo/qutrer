@@ -4,6 +4,7 @@ import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
 import Tweet from '../components/Tweet';
 import AdminIcon from '../components/AdminIcon';
+import ProfileImageUploader from '../components/ProfileImageUploader';
 
 export default function TweetDetail({ currentUser }) {
   const { tweetId } = useParams();
@@ -73,6 +74,7 @@ export default function TweetDetail({ currentUser }) {
           isDetail={true}
         />
         {currentUser?.isAdmin && <AdminIcon />}
+        {currentUser && <ProfileImageUploader currentUser={currentUser} />}
       </div>
     </div>
   );

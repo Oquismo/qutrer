@@ -4,6 +4,8 @@ import { auth } from "../firebase";
 import { useAuth } from "../context/AuthContext";
 import AdminIcon from "./AdminIcon";
 
+const DEFAULT_PROFILE_IMAGE = "https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png";
+
 export default function Navbar() {
   const { user, isAdmin } = useAuth();
 
@@ -23,6 +25,11 @@ export default function Navbar() {
                 to={`/profile/${user.uid}`}
                 className="text-gray-200 hover:text-white px-4 py-2 text-base font-medium rounded-full hover:bg-gray-800 transition-colors"
               >
+                <img 
+                  src={user.photoURL || DEFAULT_PROFILE_IMAGE} 
+                  alt="Perfil" 
+                  className="w-8 h-8 rounded-full inline-block mr-2"
+                />
                 Mi Perfil {isAdmin && <AdminIcon />}
               </Link>
             )}
