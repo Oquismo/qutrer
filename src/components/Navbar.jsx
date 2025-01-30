@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { auth } from "../firebase";
+import { auth, db } from "../firebase";
+import { doc, getDoc } from "firebase/firestore";
 import { useAuth } from "../context/AuthContext";
 import AdminIcon from "./AdminIcon";
 
@@ -8,12 +9,28 @@ const DEFAULT_PROFILE_IMAGE = "https://abs.twimg.com/sticky/default_profile_imag
 
 export default function Navbar() {
   const { user, isAdmin } = useAuth();
+  const [userImage, setUserImage] = useState(DEFAULT_PROFILE_IMAGE);
+
+  useEffect(() => {
+    const fetchUserImage = async () => {
+      if (user?.uid) {
+        const userRef = doc(db, "users", user.uid);
+        const userDoc = await getDoc(userRef);
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          setUserImage(userData.photoURL || DEFAULT_PROFILE_IMAGE);
+        }
+      }
+    };
+
+    fetchUserImage();
+  }, [user]);
 
   return (
     <nav className="sticky top-0 z-50 bg-[#15202B] border-b border-gray-800">
       <div className="max-w-2xl mx-auto">
         <div className="flex justify-between items-center h-14 px-4">
-          <div className="flex space-x-4">
+          <div className="flex items-center space-x-4">
             <Link 
               to="/" 
               className="text-gray-200 hover:text-white px-4 py-2 text-base font-medium rounded-full hover:bg-gray-800 transition-colors"
@@ -23,14 +40,20 @@ export default function Navbar() {
             {user && (
               <Link 
                 to={`/profile/${user.uid}`}
-                className="text-gray-200 hover:text-white px-4 py-2 text-base font-medium rounded-full hover:bg-gray-800 transition-colors"
+                className="flex items-center text-gray-200 hover:text-white px-4 py-2 text-base font-medium rounded-full hover:bg-gray-800 transition-colors"
               >
-                <img 
-                  src={user.photoURL || DEFAULT_PROFILE_IMAGE} 
-                  alt="Perfil" 
-                  className="w-8 h-8 rounded-full inline-block mr-2"
-                />
-                Mi Perfil {isAdmin && <AdminIcon />}
+                <div className="w-8 h-8 rounded-full overflow-hidden mr-2">
+                  <img 
+                    src={userImage}
+                    alt="Perfil"
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.target.src = DEFAULT_PROFILE_IMAGE;
+                    }}
+                  />
+                </div>
+                <span>Mi Perfil</span>
+                {isAdmin && <AdminIcon className="ml-2" />}
               </Link>
             )}
           </div>

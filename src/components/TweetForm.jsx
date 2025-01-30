@@ -1,26 +1,33 @@
 // src/components/TweetForm.jsx
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { db } from "../firebase";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp, doc, getDoc } from "firebase/firestore";
 import { useAuth } from '../context/AuthContext';
 
 const MAX_TWEET_LENGTH = 280;
 const DEFAULT_PROFILE_IMAGE = "https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png";
 
-export default React.memo(function TweetForm({ user }) {
+export default React.memo(function TweetForm() {
   const [tweetText, setTweetText] = useState("");
   const [isPosting, setIsPosting] = useState(false);
-  const [profileImg, setProfileImg] = useState(DEFAULT_PROFILE_IMAGE);
+  const [userImage, setUserImage] = useState(DEFAULT_PROFILE_IMAGE);
   const textareaRef = useRef(null);
-  const { user: authUser } = useAuth();
+  const { user } = useAuth();
 
   useEffect(() => {
-    // Verifica y actualiza la imagen de perfil cuando el usuario cambia
-    if (authUser?.photoURL) {
-      console.log("URL de foto de perfil:", authUser.photoURL); // Para debug
-      setProfileImg(authUser.photoURL);
-    }
-  }, [authUser]);
+    const fetchUserImage = async () => {
+      if (user?.uid) {
+        const userRef = doc(db, "users", user.uid);
+        const userDoc = await getDoc(userRef);
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          setUserImage(userData.photoURL || DEFAULT_PROFILE_IMAGE);
+        }
+      }
+    };
+
+    fetchUserImage();
+  }, [user]);
 
   const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
@@ -57,19 +64,16 @@ export default React.memo(function TweetForm({ user }) {
   return (
     <form onSubmit={handleSubmit} className="px-4 py-4 border-b border-gray-800 hover:bg-gray-900/30 transition-colors">
       <div className="flex gap-3">
-        {user && (
-          <div className="relative shrink-0">
-            <img 
-              src={profileImg}
-              alt={user.displayName || "Usuario"}
-              className="w-12 h-12 rounded-full ring-2 ring-gray-800 hover:ring-blue-500 transition-all"
-              onError={(e) => {
-                console.log("Error al cargar la imagen, usando imagen por defecto");
-                e.target.src = DEFAULT_PROFILE_IMAGE;
-              }}
-            />
-          </div>
-        )}
+        <div className="relative shrink-0">
+          <img 
+            src={userImage}
+            alt={user?.displayName || "Usuario"}
+            className="w-12 h-12 rounded-full ring-2 ring-gray-800 hover:ring-blue-500 transition-all"
+            onError={(e) => {
+              e.target.src = DEFAULT_PROFILE_IMAGE;
+            }}
+          />
+        </div>
         <div className="flex-1 min-w-0">
           <textarea
             ref={textareaRef}
