@@ -35,7 +35,9 @@ export default function TweetForm({ user }) {
         userImage: user.photoURL,
         timestamp: serverTimestamp(),
         likes: 0,
+        likedBy: [], // Añadir este campo
         retweets: 0,
+        retweetedBy: [], // Añadir este campo
       });
 
       setTweetText("");

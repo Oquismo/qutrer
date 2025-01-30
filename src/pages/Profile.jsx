@@ -10,9 +10,10 @@ const DEFAULT_PROFILE_IMAGE = "https://abs.twimg.com/sticky/default_profile_imag
 export default function Profile({ currentUser }) {
   const { userId } = useParams();
   const [userTweets, setUserTweets] = useState([]);
+  const [likedTweets, setLikedTweets] = useState([]);
   const [profileUser, setProfileUser] = useState(null);
-  
-  // Obtener datos del usuario del perfil
+  const [activeTab, setActiveTab] = useState('tweets'); // Nueva variable para controlar las pestañas
+
   useEffect(() => {
     const targetUserId = userId || currentUser?.uid;
     if (!targetUserId) return;
@@ -44,6 +45,25 @@ export default function Profile({ currentUser }) {
       })));
     });
 
+    // Añadir consulta para tweets likeados
+    const fetchLikedTweets = async () => {
+      const likedTweetsQuery = query(
+        collection(db, "tweets"),
+        where("likedBy", "array-contains", targetUserId)
+      );
+
+      const unsubscribeLikes = onSnapshot(likedTweetsQuery, (snapshot) => {
+        setLikedTweets(snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        })));
+      });
+
+      return () => unsubscribeLikes();
+    };
+
+    fetchLikedTweets();
+
     return () => unsubscribe();
   }, [userId, currentUser]);
 
@@ -71,9 +91,9 @@ export default function Profile({ currentUser }) {
             {/* Nombre y username */}
             <div className="mb-4">
               <h1 className="text-xl font-bold text-white">
-                {profileUser.displayName || profileUser.email?.split('@')[0]}
+                {profileUser.displayName || profileUser.username || profileUser.email?.split('@')[0]}
               </h1>
-              <p className="text-gray-500">@{profileUser.email?.split('@')[0]}</p>
+              <p className="text-gray-500">@{profileUser.username || profileUser.email?.split('@')[0]}</p>
             </div>
 
             {/* Estadísticas */}
@@ -85,16 +105,52 @@ export default function Profile({ currentUser }) {
           </div>
         </div>
 
-        {/* Lista de tweets */}
+        {/* Tabs */}
+        <div className="flex border-b border-gray-800">
+          <button
+            className={`flex-1 py-4 text-center ${
+              activeTab === 'tweets' 
+                ? 'text-blue-500 border-b-2 border-blue-500' 
+                : 'text-gray-500 hover:text-gray-300'
+            }`}
+            onClick={() => setActiveTab('tweets')}
+          >
+            Tweets
+          </button>
+          <button
+            className={`flex-1 py-4 text-center ${
+              activeTab === 'likes' 
+                ? 'text-blue-500 border-b-2 border-blue-500' 
+                : 'text-gray-500 hover:text-gray-300'
+            }`}
+            onClick={() => setActiveTab('likes')}
+          >
+            Me gusta
+          </button>
+        </div>
+
+        {/* Tweet lists */}
         <div className="border-t border-gray-800">
-          {userTweets.map(tweet => (
-            <Tweet key={tweet.id} tweet={tweet} currentUser={currentUser} />
-          ))}
-          
-          {userTweets.length === 0 && (
-            <div className="p-8 text-center text-gray-500">
-              No hay tweets para mostrar
-            </div>
+          {activeTab === 'tweets' ? (
+            userTweets.length > 0 ? (
+              userTweets.map(tweet => (
+                <Tweet key={tweet.id} tweet={tweet} currentUser={currentUser} />
+              ))
+            ) : (
+              <div className="p-8 text-center text-gray-500">
+                No hay tweets para mostrar
+              </div>
+            )
+          ) : (
+            likedTweets.length > 0 ? (
+              likedTweets.map(tweet => (
+                <Tweet key={tweet.id} tweet={tweet} currentUser={currentUser} />
+              ))
+            ) : (
+              <div className="p-8 text-center text-gray-500">
+                No hay tweets que te gusten aún
+              </div>
+            )
           )}
         </div>
       </div>

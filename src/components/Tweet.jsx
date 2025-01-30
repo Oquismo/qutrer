@@ -48,7 +48,7 @@ export default function Tweet({ tweet, currentUser }) {
                 onClick={(e) => e.stopPropagation()}
               >
                 <span className="font-bold text-white">
-                  {tweet.username?.split('@')[0] || 'Usuario'}
+                  {tweet.displayName || tweet.username?.split('@')[0] || 'Usuario'}
                 </span>
               </Link>
               <span className="text-gray-500">·</span>
@@ -98,7 +98,7 @@ export default function Tweet({ tweet, currentUser }) {
           </div>
           <p className="mt-2 text-white text-base break-words">{tweet.text}</p>
           
-          <TweetActions tweet={tweet} />
+          <TweetActions tweet={tweet} currentUser={currentUser} />
         </div>
       </div>
     </div>
