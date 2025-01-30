@@ -11,60 +11,96 @@ export default function Profile({ currentUser }) {
   const { userId } = useParams();
   const [userTweets, setUserTweets] = useState([]);
   const [likedTweets, setLikedTweets] = useState([]);
+  const [retweetedTweets, setRetweetedTweets] = useState([]);
   const [profileUser, setProfileUser] = useState(null);
   const [activeTab, setActiveTab] = useState('tweets'); // Nueva variable para controlar las pestañas
 
   useEffect(() => {
-    const targetUserId = userId || currentUser?.uid;
-    if (!targetUserId) return;
+    let unsubscribeUserTweets;
+    let unsubscribeLikes;
+    let unsubscribeRetweets;
+    
+    const loadProfile = async () => {
+      const targetUserId = userId || currentUser?.uid;
+      if (!targetUserId) return;
 
-    const fetchProfileUser = async () => {
-      if (targetUserId === currentUser?.uid) {
-        setProfileUser(currentUser);
-      } else {
-        const userDoc = await getDoc(doc(db, "users", targetUserId));
-        if (userDoc.exists()) {
-          setProfileUser(userDoc.data());
+      try {
+        // Cargar datos del usuario
+        if (targetUserId === currentUser?.uid) {
+          setProfileUser(currentUser);
+        } else {
+          const userDoc = await getDoc(doc(db, "users", targetUserId));
+          if (userDoc.exists()) {
+            setProfileUser(userDoc.data());
+          }
         }
+
+        // Tweets propios
+        const tweetsQuery = query(
+          collection(db, "tweets"),
+          where("userId", "==", targetUserId),
+          orderBy("timestamp", "desc")
+        );
+
+        unsubscribeUserTweets = onSnapshot(tweetsQuery, (snapshot) => {
+          const tweets = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          }));
+          console.log("Tweets cargados:", tweets.length);
+          setUserTweets(tweets);
+        }, (error) => {
+          console.error("Error cargando tweets:", error);
+        });
+
+        // Tweets con like
+        const likedTweetsQuery = query(
+          collection(db, "tweets"),
+          where("likedBy", "array-contains", targetUserId),
+          orderBy("timestamp", "desc")
+        );
+
+        unsubscribeLikes = onSnapshot(likedTweetsQuery, (snapshot) => {
+          const tweets = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          }));
+          console.log("Likes cargados:", tweets.length);
+          setLikedTweets(tweets);
+        }, (error) => {
+          console.error("Error cargando likes:", error);
+        });
+
+        // Tweets retweeteados
+        const retweetedQuery = query(
+          collection(db, "tweets"),
+          where("retweetedBy", "array-contains", targetUserId),
+          orderBy("timestamp", "desc")
+        );
+
+        unsubscribeRetweets = onSnapshot(retweetedQuery, (snapshot) => {
+          const tweets = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          }));
+          console.log("Retweets cargados:", tweets.length);
+          setRetweetedTweets(tweets);
+        }, (error) => {
+          console.error("Error cargando retweets:", error);
+        });
+
+      } catch (error) {
+        console.error("Error cargando perfil:", error);
       }
     };
 
-    fetchProfileUser();
-    
-    // Obtener tweets del usuario
-    const tweetsQuery = query(
-      collection(db, "tweets"),
-      where("userId", "==", targetUserId),
-      orderBy("timestamp", "desc")
-    );
+    loadProfile();
 
-    const unsubscribe = onSnapshot(tweetsQuery, (snapshot) => {
-      setUserTweets(snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })));
-    });
-
-    // Añadir consulta para tweets likeados
-    const fetchLikedTweets = async () => {
-      const likedTweetsQuery = query(
-        collection(db, "tweets"),
-        where("likedBy", "array-contains", targetUserId)
-      );
-
-      const unsubscribeLikes = onSnapshot(likedTweetsQuery, (snapshot) => {
-        setLikedTweets(snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        })));
-      });
-
-      return () => unsubscribeLikes();
+    return () => {
+      if (unsubscribeUserTweets) unsubscribeUserTweets();
+      if (unsubscribeLikes) unsubscribeLikes();
+      if (unsubscribeRetweets) unsubscribeRetweets();
     };
-
-    fetchLikedTweets();
-
-    return () => unsubscribe();
   }, [userId, currentUser]);
 
   if (!profileUser) return null;
@@ -119,6 +155,16 @@ export default function Profile({ currentUser }) {
           </button>
           <button
             className={`flex-1 py-4 text-center ${
+              activeTab === 'retweets' 
+                ? 'text-blue-500 border-b-2 border-blue-500' 
+                : 'text-gray-500 hover:text-gray-300'
+            }`}
+            onClick={() => setActiveTab('retweets')}
+          >
+            Retweets
+          </button>
+          <button
+            className={`flex-1 py-4 text-center ${
               activeTab === 'likes' 
                 ? 'text-blue-500 border-b-2 border-blue-500' 
                 : 'text-gray-500 hover:text-gray-300'
@@ -139,6 +185,16 @@ export default function Profile({ currentUser }) {
             ) : (
               <div className="p-8 text-center text-gray-500">
                 No hay tweets para mostrar
+              </div>
+            )
+          ) : activeTab === 'retweets' ? (
+            retweetedTweets.length > 0 ? (
+              retweetedTweets.map(tweet => (
+                <Tweet key={tweet.id} tweet={tweet} currentUser={currentUser} />
+              ))
+            ) : (
+              <div className="p-8 text-center text-gray-500">
+                No has retweeteado ningún tweet aún
               </div>
             )
           ) : (
