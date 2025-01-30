@@ -3,11 +3,12 @@ import { formatDistance } from "date-fns";
 import { es } from "date-fns/locale";
 import { useNavigate, Link } from "react-router-dom";
 import TweetActions from "./TweetActions";
+import FollowButton from './FollowButton';
 import { deleteTweet, isUserAdmin } from "../firebase";
 
 const DEFAULT_PROFILE_IMAGE = "https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png";
 
-export default function Tweet({ tweet, currentUser }) {
+export default function Tweet({ tweet, currentUser, isDetail = false }) {
   const timestamp = tweet.timestamp?.toDate();
   const isAdmin = isUserAdmin(currentUser?.uid);
   const navigate = useNavigate();
@@ -21,9 +22,25 @@ export default function Tweet({ tweet, currentUser }) {
       }
     }
   };
+
+  const handleClick = (e) => {
+    if (isDetail) return; // No navegar si ya estamos en la vista detalle
+    if (e.target.closest('button') || e.target.closest('a')) return; // No navegar si se clickea en botones o links
+    navigate(`/tweet/${tweet.id}`);
+  };
+
+  const preventPropagation = (e) => {
+    e.stopPropagation();
+  };
   
   return (
-    <div className="p-4 border-b border-gray-800 hover:bg-gray-900/30 transition-all duration-200 cursor-pointer group">
+    <div 
+      onClick={handleClick}
+      className={`p-4 border-b border-gray-800 ${
+        !isDetail ? 'hover:bg-gray-900/30 cursor-pointer' : ''
+      } transition-all duration-200 group`}
+      role="article"
+    >
       <div className="flex space-x-3">
         <Link 
           to={`/profile/${tweet.userId}`}
@@ -39,7 +56,7 @@ export default function Tweet({ tweet, currentUser }) {
             }}
           />
         </Link>
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0" onClick={preventPropagation}>
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <Link 
@@ -58,42 +75,55 @@ export default function Tweet({ tweet, currentUser }) {
                 </span>
               )}
             </div>
-            <div className="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
-              {currentUser && tweet.userId === currentUser.uid && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDelete();
-                  }}
-                  className="p-2 rounded-full hover:bg-red-500/10 group transition-colors"
-                  title="Eliminar mi tweet"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="w-5 h-5 text-gray-500 group-hover:text-red-500"
-                  >
-                    <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
-                </button>
+            <div className="flex items-center gap-4">
+              {/* Botón de seguir */}
+              {currentUser && tweet.userId !== currentUser.uid && (
+                <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                  <FollowButton
+                    targetUserId={tweet.userId}
+                    currentUser={currentUser}
+                    size="small" // Nuevo prop para un botón más pequeño
+                  />
+                </div>
               )}
+              {/* Botones de eliminar existentes */}
+              <div className="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                {currentUser && tweet.userId === currentUser.uid && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete();
+                    }}
+                    className="p-2 rounded-full hover:bg-red-500/10 group transition-colors"
+                    title="Eliminar mi tweet"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="w-5 h-5 text-gray-500 group-hover:text-red-500"
+                    >
+                      <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                )}
 
-              {isAdmin && tweet.userId !== currentUser?.uid && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDelete();
-                  }}
-                  className="p-2 rounded-full hover:bg-yellow-500/10 group transition-colors"
-                  title="Eliminar como administrador"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="w-5 h-5 text-yellow-500"
+                {isAdmin && tweet.userId !== currentUser?.uid && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete();
+                    }}
+                    className="p-2 rounded-full hover:bg-yellow-500/10 group transition-colors"
+                    title="Eliminar como administrador"
                   >
-                    <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 6c1.4 0 2.5 1.1 2.5 2.5S13.4 12 12 12s-2.5-1.1 2.5-2.5S10.6 7 12 7zm0 6.5c2.33 0 4.3 1.46 5.11 3.5H6.89c.8-2.04 2.78-3.5 5.11-3.5z"/>
-                  </svg>
-                </button>
-              )}
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="w-5 h-5 text-yellow-500"
+                    >
+                      <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 6c1.4 0 2.5 1.1 2.5 2.5S13.4 12 12 12s-2.5-1.1 2.5-2.5S10.6 7 12 7zm0 6.5c2.33 0 4.3 1.46 5.11 3.5H6.89c.8-2.04 2.78-3.5 5.11-3.5z"/>
+                    </svg>
+                  </button>
+                )}
+              </div>
             </div>
           </div>
           <p className="mt-2 text-white text-base break-words">{tweet.text}</p>

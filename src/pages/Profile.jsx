@@ -2,8 +2,9 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { db } from "../firebase";
-import { collection, query, where, orderBy, onSnapshot, getDoc, doc } from "firebase/firestore";
+import { collection, query, where, orderBy, onSnapshot, getDoc, doc, setDoc } from "firebase/firestore";
 import Tweet from "../components/Tweet";
+import FollowButton from '../components/FollowButton';
 
 const DEFAULT_PROFILE_IMAGE = "https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png";
 
@@ -16,23 +17,55 @@ export default function Profile({ currentUser }) {
   const [activeTab, setActiveTab] = useState('tweets'); // Nueva variable para controlar las pestañas
 
   useEffect(() => {
-    let unsubscribeUserTweets;
-    let unsubscribeLikes;
-    let unsubscribeRetweets;
+    let unsubscribeAll = [];
     
     const loadProfile = async () => {
+      // Si no hay userId en la URL, usar el ID del usuario actual
       const targetUserId = userId || currentUser?.uid;
-      if (!targetUserId) return;
+      
+      if (!targetUserId) {
+        console.log("No hay userId para cargar");
+        return;
+      }
 
       try {
-        // Cargar datos del usuario
+        // Si es el perfil del usuario actual, establecer los datos inmediatamente
         if (targetUserId === currentUser?.uid) {
-          setProfileUser(currentUser);
-        } else {
-          const userDoc = await getDoc(doc(db, "users", targetUserId));
-          if (userDoc.exists()) {
-            setProfileUser(userDoc.data());
+          // Crear o actualizar el documento del usuario en Firestore si no existe
+          const userDocRef = doc(db, "users", currentUser.uid);
+          const userDoc = await getDoc(userDocRef);
+          
+          if (!userDoc.exists()) {
+            await setDoc(userDocRef, {
+              displayName: currentUser.displayName,
+              email: currentUser.email,
+              photoURL: currentUser.photoURL,
+              followers: [],
+              following: []
+            });
           }
+          
+          // Establecer los datos del perfil
+          setProfileUser({
+            uid: currentUser.uid,
+            displayName: currentUser.displayName,
+            photoURL: currentUser.photoURL,
+            email: currentUser.email,
+            followers: userDoc.exists() ? userDoc.data().followers : [],
+            following: userDoc.exists() ? userDoc.data().following : []
+          });
+        } else {
+          // Si es otro usuario, obtener sus datos de Firestore
+          const userDocRef = doc(db, "users", targetUserId);
+          const unsubscribeUser = onSnapshot(userDocRef, (doc) => {
+            if (doc.exists()) {
+              setProfileUser({
+                uid: doc.id,
+                ...doc.data()
+              });
+            }
+          });
+          unsubscribeAll.push(unsubscribeUser);
         }
 
         // Tweets propios
@@ -42,7 +75,7 @@ export default function Profile({ currentUser }) {
           orderBy("timestamp", "desc")
         );
 
-        unsubscribeUserTweets = onSnapshot(tweetsQuery, (snapshot) => {
+        const unsubscribeUserTweets = onSnapshot(tweetsQuery, (snapshot) => {
           const tweets = snapshot.docs.map(doc => ({
             id: doc.id,
             ...doc.data()
@@ -53,6 +86,8 @@ export default function Profile({ currentUser }) {
           console.error("Error cargando tweets:", error);
         });
 
+        unsubscribeAll.push(unsubscribeUserTweets);
+
         // Tweets con like
         const likedTweetsQuery = query(
           collection(db, "tweets"),
@@ -60,7 +95,7 @@ export default function Profile({ currentUser }) {
           orderBy("timestamp", "desc")
         );
 
-        unsubscribeLikes = onSnapshot(likedTweetsQuery, (snapshot) => {
+        const unsubscribeLikes = onSnapshot(likedTweetsQuery, (snapshot) => {
           const tweets = snapshot.docs.map(doc => ({
             id: doc.id,
             ...doc.data()
@@ -71,6 +106,8 @@ export default function Profile({ currentUser }) {
           console.error("Error cargando likes:", error);
         });
 
+        unsubscribeAll.push(unsubscribeLikes);
+
         // Tweets retweeteados
         const retweetedQuery = query(
           collection(db, "tweets"),
@@ -78,7 +115,7 @@ export default function Profile({ currentUser }) {
           orderBy("timestamp", "desc")
         );
 
-        unsubscribeRetweets = onSnapshot(retweetedQuery, (snapshot) => {
+        const unsubscribeRetweets = onSnapshot(retweetedQuery, (snapshot) => {
           const tweets = snapshot.docs.map(doc => ({
             id: doc.id,
             ...doc.data()
@@ -89,6 +126,8 @@ export default function Profile({ currentUser }) {
           console.error("Error cargando retweets:", error);
         });
 
+        unsubscribeAll.push(unsubscribeRetweets);
+
       } catch (error) {
         console.error("Error cargando perfil:", error);
       }
@@ -97,9 +136,7 @@ export default function Profile({ currentUser }) {
     loadProfile();
 
     return () => {
-      if (unsubscribeUserTweets) unsubscribeUserTweets();
-      if (unsubscribeLikes) unsubscribeLikes();
-      if (unsubscribeRetweets) unsubscribeRetweets();
+      unsubscribeAll.forEach(unsubscribe => unsubscribe());
     };
   }, [userId, currentUser]);
 
@@ -124,19 +161,35 @@ export default function Profile({ currentUser }) {
               />
             </div>
 
-            {/* Nombre y username */}
-            <div className="mb-4">
-              <h1 className="text-xl font-bold text-white">
-                {profileUser.displayName || profileUser.username || profileUser.email?.split('@')[0]}
-              </h1>
-              <p className="text-gray-500">@{profileUser.username || profileUser.email?.split('@')[0]}</p>
+            {/* Nombre y username con botón de seguir */}
+            <div className="flex justify-between items-center mb-4">
+              <div>
+                <h1 className="text-xl font-bold text-white">
+                  {profileUser?.displayName || profileUser?.username || profileUser?.email?.split('@')[0]}
+                </h1>
+                <p className="text-gray-500">
+                  @{profileUser?.username || profileUser?.email?.split('@')[0]}
+                </p>
+              </div>
+              {profileUser?.uid !== currentUser?.uid && (
+                <FollowButton
+                  targetUserId={profileUser?.uid}
+                  currentUser={currentUser}
+                />
+              )}
             </div>
 
-            {/* Estadísticas */}
+            {/* Estadísticas actualizadas */}
             <div className="flex space-x-6 text-gray-500 mb-4">
-              <span><b className="text-white">{userTweets.length}</b> Tweets</span>
-              <span><b className="text-white">0</b> Siguiendo</span>
-              <span><b className="text-white">0</b> Seguidores</span>
+              <span>
+                <b className="text-white">{userTweets.length}</b> Tweets
+              </span>
+              <span>
+                <b className="text-white">{profileUser?.following?.length || 0}</b> Siguiendo
+              </span>
+              <span>
+                <b className="text-white">{profileUser?.followers?.length || 0}</b> Seguidores
+              </span>
             </div>
           </div>
         </div>

@@ -70,8 +70,12 @@ export default function TweetActions({ tweet, currentUser }) {
     }
   };
 
+  const stopPropagation = (e) => {
+    e.stopPropagation();
+  };
+
   return (
-    <div className="flex justify-start space-x-8 mt-3">
+    <div className="flex justify-start space-x-8 mt-3" onClick={stopPropagation}>
       {/* Comentarios button */}
       <button className="flex items-center space-x-2 text-gray-500 hover:text-blue-500 transition-colors">
         <svg className="w-5 h-5" viewBox="0 0 24 24" width="18" height="18" fill="currentColor">

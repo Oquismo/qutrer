@@ -14,12 +14,14 @@ export default function Navbar({ user }) {
             >
               Inicio
             </Link>
-            <Link 
-              to="/profile" 
-              className="text-gray-200 hover:text-white px-4 py-2 text-base font-medium rounded-full hover:bg-gray-800 transition-colors"
-            >
-              Perfil
-            </Link>
+            {user && (
+              <Link 
+                to={`/profile/${user.uid}`}
+                className="text-gray-200 hover:text-white px-4 py-2 text-base font-medium rounded-full hover:bg-gray-800 transition-colors"
+              >
+                Mi Perfil
+              </Link>
+            )}
           </div>
 
           {user && (
