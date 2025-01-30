@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { db, auth } from '../firebase';
 import { doc, getDoc, collection, query, where, getDocs, orderBy } from 'firebase/firestore';
 import { useAuth } from "../context/AuthContext";
-import AdminIcon from "./AdminIcon";
+import { ReactComponent as AdminIcon } from '../icons/progress-check.svg';
 
 const UserProfile = () => {
   const { userId } = useParams();
@@ -13,6 +13,7 @@ const UserProfile = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { isAdmin } = useAuth();
+  const [isAdminUser, setIsAdminUser] = useState(false);
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -45,6 +46,9 @@ const UserProfile = () => {
           });
           setUserTweets(tweets);
         }
+
+        const adminDoc = await getDoc(doc(db, 'admins', userId));
+        setIsAdminUser(adminDoc.exists());
 
       } catch (error) {
         console.error('Error al obtener el perfil:', error);
@@ -95,7 +99,7 @@ const UserProfile = () => {
           />
           <div>
             <h2 className="text-xl font-bold">
-              {userProfile.displayName || userProfile.email?.split('@')[0]} {isAdmin && <AdminIcon />}
+              {userProfile.displayName || userProfile.email?.split('@')[0]} {isAdminUser && <AdminIcon className="w-4 h-4 text-blue-500 ml-2" />}
             </h2>
             <p className="text-gray-400">@{userProfile.username?.split('@')[0] || userProfile.displayName?.split('@')[0]}</p>
           </div>

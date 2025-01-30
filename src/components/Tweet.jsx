@@ -5,14 +5,23 @@ import { useNavigate, Link } from "react-router-dom";
 import TweetActions from "./TweetActions";
 import FollowButton from './FollowButton';
 import { deleteTweet, isUserAdmin } from "../firebase";
+import { ReactComponent as AdminIcon } from '../icons/progress-check.svg';
 
 const DEFAULT_PROFILE_IMAGE = "https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png";
 
 export default React.memo(function Tweet({ tweet, currentUser, isDetail = false }) {
   const timestamp = tweet.timestamp?.toDate();
-  const isAdmin = isUserAdmin(currentUser?.uid);
+  const [isAdmin, setIsAdmin] = React.useState(false);
   const navigate = useNavigate();
   
+  React.useEffect(() => {
+    const checkAdmin = async () => {
+      const adminStatus = await isUserAdmin(tweet.userId);
+      setIsAdmin(adminStatus);
+    };
+    checkAdmin();
+  }, [tweet.userId]);
+
   const handleDelete = React.useCallback(async () => {
     if (window.confirm('¿Estás seguro de que quieres eliminar este tweet?')) {
       try {
@@ -68,6 +77,7 @@ export default React.memo(function Tweet({ tweet, currentUser, isDetail = false 
                   {tweet.displayName || tweet.username?.split('@')[0] || 'Usuario'}
                 </span>
               </Link>
+              {isAdmin && <AdminIcon className="w-4 h-4 text-blue-500" />}
               <span className="text-gray-500">·</span>
               {timestamp && (
                 <span className="text-gray-500 text-sm">
