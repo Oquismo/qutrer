@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { db, auth } from '../firebase';
-import { doc, getDoc, collection, query, where, getDocs, orderBy } from 'firebase/firestore';
+import { db, auth, storage } from '../firebase';
+import { doc, getDoc, collection, query, where, getDocs, orderBy, updateDoc } from 'firebase/firestore';
 import { useAuth } from "../context/AuthContext";
 import { ReactComponent as AdminIcon } from '../icons/progress-check.svg';
+import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
 
 const UserProfile = () => {
   const { userId } = useParams();
@@ -12,7 +13,7 @@ const UserProfile = () => {
   const [userTweets, setUserTweets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { isAdmin } = useAuth();
+  const { user, isAdmin } = useAuth();
   const [isAdminUser, setIsAdminUser] = useState(false);
 
   useEffect(() => {
@@ -61,6 +62,30 @@ const UserProfile = () => {
     fetchUserProfile();
   }, [userId]);
 
+  const handleImageChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const storageRef = ref(storage, `profileImages/${user.uid}`);
+    const uploadTask = uploadBytesResumable(storageRef, file);
+
+    uploadTask.on('state_changed', 
+      (snapshot) => {
+        // Puedes manejar el progreso de la subida aquí si lo deseas
+      }, 
+      (error) => {
+        console.error('Error al subir la imagen:', error);
+      }, 
+      async () => {
+        const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+        await updateDoc(doc(db, 'users', user.uid), {
+          photoURL: downloadURL
+        });
+        setUserProfile((prev) => ({ ...prev, photoURL: downloadURL }));
+      }
+    );
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen text-white">
@@ -97,6 +122,14 @@ const UserProfile = () => {
               e.target.src = 'https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png';
             }}
           />
+          {user?.uid === userId && (
+            <input 
+              type="file" 
+              accept="image/*" 
+              onChange={handleImageChange} 
+              className="text-white"
+            />
+          )}
           <div>
             <h2 className="text-xl font-bold">
               {userProfile.displayName || userProfile.email?.split('@')[0]} {isAdminUser && <AdminIcon className="w-4 h-4 text-blue-500 ml-2" />}

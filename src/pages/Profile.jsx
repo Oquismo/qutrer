@@ -2,19 +2,33 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { db } from "../firebase";
-import { collection, query, where, orderBy, onSnapshot, getDoc, doc, setDoc, serverTimestamp } from "firebase/firestore";
+import { collection, query, where, orderBy, onSnapshot, getDoc, doc, setDoc, serverTimestamp, updateDoc } from "firebase/firestore";
 import Tweet from "../components/Tweet";
 import FollowButton from '../components/FollowButton';
+import { useAuth } from '../context/AuthContext';
 
 const DEFAULT_PROFILE_IMAGE = "https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png";
 
 export default function Profile({ currentUser }) {
+  const { user } = useAuth();
   const { userId } = useParams();
   const [userTweets, setUserTweets] = useState([]);
   const [likedTweets, setLikedTweets] = useState([]);
   const [retweetedTweets, setRetweetedTweets] = useState([]);
   const [profileUser, setProfileUser] = useState(null);
   const [activeTab, setActiveTab] = useState('tweets'); // Nueva variable para controlar las pestañas
+  const [newPhotoURL, setNewPhotoURL] = useState('');
+
+  const handlePhotoChange = async () => {
+    if (!newPhotoURL) return;
+    try {
+      const userRef = doc(db, 'users', user.uid);
+      await updateDoc(userRef, { photoURL: newPhotoURL });
+      alert('Imagen de perfil actualizada');
+    } catch (error) {
+      console.error('Error al actualizar la imagen de perfil:', error);
+    }
+  };
 
   useEffect(() => {
     let unsubscribeAll = [];
@@ -166,6 +180,25 @@ export default function Profile({ currentUser }) {
                 <b className="text-white">{profileUser?.followers?.length || 0}</b> Seguidores
               </span>
             </div>
+
+            {/* Cambiar imagen de perfil */}
+            {profileUser?.uid === currentUser?.uid && (
+              <div className="flex flex-col items-center">
+                <input
+                  type="text"
+                  placeholder="Nuevo URL de imagen"
+                  value={newPhotoURL}
+                  onChange={(e) => setNewPhotoURL(e.target.value)}
+                  className="w-full p-2 mb-4 rounded bg-gray-800 text-white"
+                />
+                <button
+                  onClick={handlePhotoChange}
+                  className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+                >
+                  Cambiar imagen de perfil
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
