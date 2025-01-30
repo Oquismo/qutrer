@@ -8,12 +8,12 @@ import { deleteTweet, isUserAdmin } from "../firebase";
 
 const DEFAULT_PROFILE_IMAGE = "https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png";
 
-export default function Tweet({ tweet, currentUser, isDetail = false }) {
+export default React.memo(function Tweet({ tweet, currentUser, isDetail = false }) {
   const timestamp = tweet.timestamp?.toDate();
   const isAdmin = isUserAdmin(currentUser?.uid);
   const navigate = useNavigate();
   
-  const handleDelete = async () => {
+  const handleDelete = React.useCallback(async () => {
     if (window.confirm('¿Estás seguro de que quieres eliminar este tweet?')) {
       try {
         await deleteTweet(tweet.id, currentUser);
@@ -21,13 +21,13 @@ export default function Tweet({ tweet, currentUser, isDetail = false }) {
         console.error("Error al eliminar tweet:", error);
       }
     }
-  };
+  }, [tweet.id, currentUser]);
 
-  const handleClick = (e) => {
+  const handleClick = React.useCallback((e) => {
     if (isDetail) return; // No navegar si ya estamos en la vista detalle
     if (e.target.closest('button') || e.target.closest('a')) return; // No navegar si se clickea en botones o links
     navigate(`/tweet/${tweet.id}`);
-  };
+  }, [isDetail, tweet.id, navigate]);
 
   const preventPropagation = (e) => {
     e.stopPropagation();
@@ -133,4 +133,4 @@ export default function Tweet({ tweet, currentUser, isDetail = false }) {
       </div>
     </div>
   );
-}
+});

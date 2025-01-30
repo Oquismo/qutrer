@@ -13,31 +13,48 @@ export function AuthProvider({ children }) {
     const unsubscribe = onAuthStateChanged(auth, async (authUser) => {
       if (authUser) {
         try {
-          // Verificar si el usuario existe en Firestore
-          const userRef = doc(db, 'users', authUser.uid);
+          // Referencia al documento del usuario
+          const userRef = doc(db, "users", authUser.uid);
+          
+          // Intentar obtener el documento existente
           const userDoc = await getDoc(userRef);
-
+          
           if (!userDoc.exists()) {
-            // Crear documento de usuario si no existe
-            await setDoc(userRef, {
+            // Si no existe, crear documento con datos iniciales
+            const userData = {
               uid: authUser.uid,
               email: authUser.email,
               displayName: authUser.displayName || authUser.email?.split('@')[0],
               photoURL: authUser.photoURL,
+              username: authUser.email?.split('@')[0],
               followers: [],
               following: [],
               createdAt: serverTimestamp()
-            });
+            };
             
-            // Obtener el documento actualizado
-            const updatedDoc = await getDoc(userRef);
-            setUser({ ...authUser, ...updatedDoc.data() });
+            await setDoc(userRef, userData);
+            setUser({ ...authUser, ...userData });
           } else {
-            // Combinar datos de Auth y Firestore
-            setUser({ ...authUser, ...userDoc.data() });
+            // Si existe, asegurarse de que tenga todos los campos necesarios
+            const existingData = userDoc.data();
+            const updates = {};
+            
+            if (!existingData.uid) updates.uid = authUser.uid;
+            if (!existingData.displayName) updates.displayName = authUser.displayName || authUser.email?.split('@')[0];
+            if (!existingData.username) updates.username = authUser.email?.split('@')[0];
+            if (!existingData.followers) updates.followers = [];
+            if (!existingData.following) updates.following = [];
+            
+            if (Object.keys(updates).length > 0) {
+              await setDoc(userRef, updates, { merge: true });
+              setUser({ ...authUser, ...existingData, ...updates });
+            } else {
+              setUser({ ...authUser, ...existingData });
+            }
           }
         } catch (error) {
-          console.error("Error setting up user:", error);
+          console.error("Error initializing user:", error);
+          setUser(authUser);
         }
       } else {
         setUser(null);
@@ -48,10 +65,7 @@ export function AuthProvider({ children }) {
     return () => unsubscribe();
   }, []);
 
-  const value = {
-    user,
-    loading
-  };
+  const value = useMemo(() => ({ user, loading }), [user, loading]);
 
   return (
     <AuthContext.Provider value={value}>

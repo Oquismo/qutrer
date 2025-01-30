@@ -1,12 +1,12 @@
 // src/components/TweetForm.jsx
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { db } from "../firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
 const MAX_TWEET_LENGTH = 280;
 const DEFAULT_PROFILE_IMAGE = "https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png";
 
-export default function TweetForm({ user }) {
+export default React.memo(function TweetForm({ user }) {
   const [tweetText, setTweetText] = useState("");
   const [isPosting, setIsPosting] = useState(false);
   const [profileImg, setProfileImg] = useState(DEFAULT_PROFILE_IMAGE);
@@ -20,33 +20,32 @@ export default function TweetForm({ user }) {
     }
   }, [user]);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
-    if (!tweetText.trim()) return;
+    if (!tweetText.trim() || isPosting) return;
 
     setIsPosting(true);
     try {
-      console.log("Usuario actual:", user); // Para debug
-
-      await addDoc(collection(db, "tweets"), {
+      const tweetData = {
         text: tweetText,
         userId: user.uid,
-        username: user.displayName || user.email?.split('@')[0] || 'Usuario',
+        username: user.displayName || user.email?.split('@')[0],
         userImage: user.photoURL,
         timestamp: serverTimestamp(),
         likes: 0,
-        likedBy: [], // Añadir este campo
+        likedBy: [],
         retweets: 0,
-        retweetedBy: [], // Añadir este campo
-      });
+        retweetedBy: [],
+      };
 
+      await addDoc(collection(db, "tweets"), tweetData);
       setTweetText("");
     } catch (error) {
       console.error("Error al publicar tweet:", error);
     } finally {
       setIsPosting(false);
     }
-  };
+  }, [tweetText, user, isPosting]);
 
   const charLimit = 280;
   const charCount = tweetText.length;
@@ -109,4 +108,4 @@ export default function TweetForm({ user }) {
       </div>
     </form>
   );
-}
+});

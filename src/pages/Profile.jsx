@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { db } from "../firebase";
-import { collection, query, where, orderBy, onSnapshot, getDoc, doc, setDoc } from "firebase/firestore";
+import { collection, query, where, orderBy, onSnapshot, getDoc, doc, setDoc, serverTimestamp } from "firebase/firestore";
 import Tweet from "../components/Tweet";
 import FollowButton from '../components/FollowButton';
 
@@ -20,52 +20,27 @@ export default function Profile({ currentUser }) {
     let unsubscribeAll = [];
     
     const loadProfile = async () => {
-      // Si no hay userId en la URL, usar el ID del usuario actual
       const targetUserId = userId || currentUser?.uid;
-      
-      if (!targetUserId) {
-        console.log("No hay userId para cargar");
-        return;
-      }
+      if (!targetUserId) return;
 
       try {
-        // Si es el perfil del usuario actual, establecer los datos inmediatamente
-        if (targetUserId === currentUser?.uid) {
-          // Crear o actualizar el documento del usuario en Firestore si no existe
-          const userDocRef = doc(db, "users", currentUser.uid);
-          const userDoc = await getDoc(userDocRef);
-          
-          if (!userDoc.exists()) {
-            await setDoc(userDocRef, {
-              displayName: currentUser.displayName,
-              email: currentUser.email,
-              photoURL: currentUser.photoURL,
-              followers: [],
-              following: []
-            });
-          }
-          
-          // Establecer los datos del perfil
-          setProfileUser({
-            uid: currentUser.uid,
-            displayName: currentUser.displayName,
-            photoURL: currentUser.photoURL,
-            email: currentUser.email,
-            followers: userDoc.exists() ? userDoc.data().followers : [],
-            following: userDoc.exists() ? userDoc.data().following : []
-          });
+        // Obtener o crear documento de usuario
+        const userRef = doc(db, "users", targetUserId);
+        const userDoc = await getDoc(userRef);
+
+        if (!userDoc.exists()) {
+          // Si el usuario no existe, crear documento básico
+          const basicUserData = {
+            uid: targetUserId,
+            displayName: "Usuario",
+            followers: [],
+            following: [],
+            createdAt: serverTimestamp()
+          };
+          await setDoc(userRef, basicUserData);
+          setProfileUser({ ...basicUserData, uid: targetUserId });
         } else {
-          // Si es otro usuario, obtener sus datos de Firestore
-          const userDocRef = doc(db, "users", targetUserId);
-          const unsubscribeUser = onSnapshot(userDocRef, (doc) => {
-            if (doc.exists()) {
-              setProfileUser({
-                uid: doc.id,
-                ...doc.data()
-              });
-            }
-          });
-          unsubscribeAll.push(unsubscribeUser);
+          setProfileUser({ ...userDoc.data(), uid: targetUserId });
         }
 
         // Tweets propios

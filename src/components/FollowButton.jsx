@@ -8,6 +8,8 @@ export default function FollowButton({ targetUserId, currentUser, size = 'normal
 
   useEffect(() => {
     const checkFollowStatus = async () => {
+      if (!currentUser?.uid || !targetUserId) return;
+      
       try {
         const userDoc = await getDoc(doc(db, "users", currentUser.uid));
         if (userDoc.exists()) {
@@ -20,25 +22,35 @@ export default function FollowButton({ targetUserId, currentUser, size = 'normal
       }
     };
 
-    if (currentUser?.uid && targetUserId) {
-      checkFollowStatus();
-    }
+    checkFollowStatus();
   }, [currentUser?.uid, targetUserId]);
 
+  const ensureUserDoc = async (userId) => {
+    const userRef = doc(db, "users", userId);
+    const userDoc = await getDoc(userRef);
+    
+    if (!userDoc.exists()) {
+      await setDoc(userRef, {
+        uid: userId,
+        followers: [],
+        following: []
+      }, { merge: true });
+    }
+  };
+
   const handleFollow = async () => {
-    if (loading || !currentUser || !targetUserId) return;
+    if (!currentUser || loading || !targetUserId || currentUser.uid === targetUserId) return;
+    
     setLoading(true);
-
     try {
-      const currentUserRef = doc(db, "users", currentUser.uid);
-      const targetUserRef = doc(db, "users", targetUserId);
-
-      // Asegurar que los documentos existan
+      // Asegurar que ambos documentos de usuario existan
       await ensureUserDoc(currentUser.uid);
       await ensureUserDoc(targetUserId);
 
+      const currentUserRef = doc(db, "users", currentUser.uid);
+      const targetUserRef = doc(db, "users", targetUserId);
+
       if (isFollowing) {
-        // Dejar de seguir
         await updateDoc(currentUserRef, {
           following: arrayRemove(targetUserId)
         });
@@ -47,7 +59,6 @@ export default function FollowButton({ targetUserId, currentUser, size = 'normal
         });
         setIsFollowing(false);
       } else {
-        // Seguir
         await updateDoc(currentUserRef, {
           following: arrayUnion(targetUserId)
         });
@@ -60,19 +71,6 @@ export default function FollowButton({ targetUserId, currentUser, size = 'normal
       console.error("Error updating follow status:", error);
     } finally {
       setLoading(false);
-    }
-  };
-
-  // Función para asegurar que el documento del usuario existe
-  const ensureUserDoc = async (userId) => {
-    const userRef = doc(db, "users", userId);
-    const userSnap = await getDoc(userRef);
-    
-    if (!userSnap.exists()) {
-      await setDoc(userRef, {
-        following: [],
-        followers: []
-      });
     }
   };
 
