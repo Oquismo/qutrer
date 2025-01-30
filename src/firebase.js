@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
-import { getFirestore, deleteDoc, doc, getDoc } from "firebase/firestore";
+import { getFirestore, deleteDoc, doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -50,13 +50,27 @@ export const deleteTweet = async (tweetId, currentUser) => {
 };
 
 // Añadir estas nuevas funciones de autenticación
-export const registerWithEmailAndPassword = async (email, password) => {
+export const registerWithEmailAndPassword = async (email, password, username) => {
   try {
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    return userCredential.user;
-  } catch (error) {
-    console.error("Error al registrar:", error);
-    throw error;
+    const res = await createUserWithEmailAndPassword(auth, email, password);
+    const user = res.user;
+    
+    // Crear documento de usuario con el nombre de usuario personalizado
+    await setDoc(doc(db, "users", user.uid), {
+      uid: user.uid,
+      email: email,
+      displayName: username,
+      username: username,
+      photoURL: null,
+      followers: [],
+      following: [],
+      createdAt: serverTimestamp()
+    });
+    
+    return user;
+  } catch (err) {
+    console.error(err);
+    throw err;
   }
 };
 

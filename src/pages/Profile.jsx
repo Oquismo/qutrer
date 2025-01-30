@@ -10,7 +10,7 @@ import { useAuth } from '../context/AuthContext';
 const DEFAULT_PROFILE_IMAGE = "https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png";
 
 export default function Profile({ currentUser }) {
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
   const { userId } = useParams();
   const [userTweets, setUserTweets] = useState([]);
   const [likedTweets, setLikedTweets] = useState([]);
@@ -24,6 +24,7 @@ export default function Profile({ currentUser }) {
     try {
       const userRef = doc(db, 'users', user.uid);
       await updateDoc(userRef, { photoURL: newPhotoURL });
+      setUser((prevUser) => ({ ...prevUser, photoURL: newPhotoURL }));
       alert('Imagen de perfil actualizada');
     } catch (error) {
       console.error('Error al actualizar la imagen de perfil:', error);
@@ -157,7 +158,8 @@ export default function Profile({ currentUser }) {
                   {profileUser?.displayName || profileUser?.username || profileUser?.email?.split('@')[0]}
                 </h1>
                 <p className="text-gray-500">
-                  @{profileUser?.username || profileUser?.email?.split('@')[0]}
+                  @{(profileUser?.username || profileUser?.email?.split('@')[0])}_
+                  {profileUser?.uid?.slice(-4)}
                 </p>
               </div>
               {profileUser?.uid !== currentUser?.uid && (

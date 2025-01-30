@@ -9,6 +9,7 @@ const GoogleLoginButton = () => {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [username, setUsername] = useState(""); // Nuevo estado
   const [isRegistering, setIsRegistering] = useState(false);
 
   const handleGoogleLogin = async () => {
@@ -45,7 +46,12 @@ const GoogleLoginButton = () => {
     setLoading(true);
     try {
       if (isRegistering) {
-        await registerWithEmailAndPassword(email, password);
+        if (!username) {
+          alert("Por favor, ingresa un nombre de usuario");
+          return;
+        }
+        // Registrar usuario con nombre de usuario personalizado
+        await registerWithEmailAndPassword(email, password, username);
       } else {
         await loginWithEmailAndPassword(email, password);
       }
@@ -68,6 +74,15 @@ const GoogleLoginButton = () => {
         </h2>
 
         <form onSubmit={handleEmailAuth} className="space-y-4">
+          {isRegistering && (
+            <input
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Nombre de usuario"
+              className="w-full p-3 rounded-lg bg-[#192734] text-white border border-gray-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
+            />
+          )}
           <input
             type="email"
             value={email}

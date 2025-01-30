@@ -14,10 +14,7 @@ export function AuthProvider({ children }) {
     const unsubscribe = onAuthStateChanged(auth, async (authUser) => {
       if (authUser) {
         try {
-          // Referencia al documento del usuario
           const userRef = doc(db, "users", authUser.uid);
-          
-          // Intentar obtener el documento existente
           const userDoc = await getDoc(userRef);
           
           if (!userDoc.exists()) {
@@ -26,8 +23,8 @@ export function AuthProvider({ children }) {
               uid: authUser.uid,
               email: authUser.email,
               displayName: authUser.displayName || authUser.email?.split('@')[0],
+              username: authUser.displayName || authUser.email?.split('@')[0],
               photoURL: authUser.photoURL,
-              username: authUser.email?.split('@')[0],
               followers: [],
               following: [],
               createdAt: serverTimestamp()
@@ -36,19 +33,16 @@ export function AuthProvider({ children }) {
             await setDoc(userRef, userData);
             setUser({ ...authUser, ...userData });
           } else {
-            // Si existe, asegurarse de que tenga todos los campos necesarios
+            // Asegurarse de que el documento tiene todos los campos necesarios
             const existingData = userDoc.data();
             const updates = {};
             
-            if (!existingData.uid) updates.uid = authUser.uid;
-            if (!existingData.displayName) updates.displayName = authUser.displayName || authUser.email?.split('@')[0];
+            if (!existingData.email) updates.email = authUser.email;
             if (!existingData.username) updates.username = authUser.email?.split('@')[0];
-            if (!existingData.followers) updates.followers = [];
-            if (!existingData.following) updates.following = [];
-            if (!existingData.photoURL) updates.photoURL = authUser.photoURL;
+            if (!existingData.displayName) updates.displayName = authUser.email?.split('@')[0];
             
             if (Object.keys(updates).length > 0) {
-              await setDoc(userRef, updates, { merge: true });
+              await updateDoc(userRef, updates);
               setUser({ ...authUser, ...existingData, ...updates });
             } else {
               setUser({ ...authUser, ...existingData });
