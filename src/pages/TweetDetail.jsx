@@ -5,6 +5,7 @@ import { db } from '../firebase';
 import Tweet from '../components/Tweet';
 import AdminIcon from '../components/AdminIcon';
 import ProfileImageUploader from '../components/ProfileImageUploader';
+import TweetBox from '../components/TweetBox';
 
 export default function TweetDetail({ currentUser }) {
   const { tweetId } = useParams();
@@ -73,6 +74,15 @@ export default function TweetDetail({ currentUser }) {
           currentUser={currentUser} 
           isDetail={true}
         />
+        {currentUser && (
+          <div className="border-t border-gray-800 p-4">
+            <TweetBox 
+              currentUser={currentUser}
+              replyTo={tweet}
+              placeholder="Publica tu respuesta"
+            />
+          </div>
+        )}
         {currentUser?.isAdmin && <AdminIcon />}
         {currentUser && <ProfileImageUploader currentUser={currentUser} />}
       </div>

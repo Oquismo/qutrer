@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import { auth, googleProvider, db, registerWithEmailAndPassword, loginWithEmailAndPassword } from "../firebase";
 import { signInWithPopup } from "firebase/auth";
 import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
-import '../styles/auth.css';  // Añadir esta línea
 
 const GoogleLoginButton = () => {
   const [loading, setLoading] = useState(false);

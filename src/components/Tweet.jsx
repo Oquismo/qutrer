@@ -75,11 +75,21 @@ export default React.memo(function Tweet({ tweet: initialTweet, currentUser, isD
   return (
     <div 
       onClick={handleClick}
-      className={`p-4 border-b border-gray-800 ${
-        !isDetail ? 'hover:bg-gray-900/30 cursor-pointer' : ''
-      } transition-all duration-200 group`}
+      className={`p-4 border-b border-gray-800 relative ${
+        !isDetail ? 'hover:bg-gray-900/30 cursor-pointer group' : ''
+      } transition-all duration-200`}
       role="article"
     >
+      {!isDetail && (
+        <div className="absolute right-4 bottom-4 text-gray-500 text-sm px-2 py-1 rounded-full border border-gray-700 opacity-0 group-hover:opacity-100 transition-opacity">
+          <span className="flex items-center gap-1">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8h16M4 16h16" />
+            </svg>
+            Ver detalles
+          </span>
+        </div>
+      )}
       <div className="flex space-x-3">
         <Link 
           to={`/profile/${tweet.userId}`}
@@ -115,19 +125,9 @@ export default React.memo(function Tweet({ tweet: initialTweet, currentUser, isD
                 </span>
               )}
             </div>
-            <div className="flex items-center gap-4">
-              {/* Botón de seguir */}
-              {currentUser && tweet.userId !== currentUser.uid && (
-                <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                  <FollowButton
-                    targetUserId={tweet.userId}
-                    currentUser={currentUser}
-                    size="small" // Nuevo prop para un botón más pequeño
-                  />
-                </div>
-              )}
-              {/* Botones de eliminar existentes */}
-              <div className="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="flex items-center gap-2">
+              {/* Botones de eliminar */}
+              <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
                 {currentUser && tweet.userId === currentUser.uid && (
                   <button
                     onClick={(e) => {
@@ -164,6 +164,17 @@ export default React.memo(function Tweet({ tweet: initialTweet, currentUser, isD
                   </button>
                 )}
               </div>
+
+              {/* Botón de seguir */}
+              {currentUser && tweet.userId !== currentUser.uid && (
+                <div className="opacity-0 group-hover:opacity-100 transition-opacity ml-2">
+                  <FollowButton
+                    targetUserId={tweet.userId}
+                    currentUser={currentUser}
+                    size="small"
+                  />
+                </div>
+              )}
             </div>
           </div>
           <p className="mt-2 text-white text-base break-words">{tweet.text}</p>

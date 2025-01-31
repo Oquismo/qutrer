@@ -1,8 +1,9 @@
 // src/components/TweetForm.jsx
 import React, { useState, useRef, useEffect, useCallback } from "react";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "../firebase";
-import { collection, addDoc, serverTimestamp, doc, getDoc } from "firebase/firestore";
 import { useAuth } from '../context/AuthContext';
+import { getUserProfile, getProfileImage } from '../utils/userUtils';
 
 const MAX_TWEET_LENGTH = 280;
 const DEFAULT_PROFILE_IMAGE = "https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png";
@@ -11,35 +12,28 @@ export default React.memo(function TweetForm() {
   const [tweetText, setTweetText] = useState("");
   const [isPosting, setIsPosting] = useState(false);
   const [userImage, setUserImage] = useState(DEFAULT_PROFILE_IMAGE);
-  const textareaRef = useRef(null);
   const { user } = useAuth();
+  const textareaRef = useRef(null);
 
   useEffect(() => {
-    const fetchUserImage = async () => {
-      if (user?.uid) {
-        const userRef = doc(db, "users", user.uid);
-        const userDoc = await getDoc(userRef);
-        if (userDoc.exists()) {
-          const userData = userDoc.data();
-          setUserImage(userData.photoURL || DEFAULT_PROFILE_IMAGE);
-        }
-      }
-    };
-
-    fetchUserImage();
+    if (user?.uid) {
+      getUserProfile(user.uid).then(profile => {
+        setUserImage(profile?.photoURL || DEFAULT_PROFILE_IMAGE);
+      });
+    }
   }, [user]);
 
   const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
-    if (!tweetText.trim() || isPosting) return;
+    if (!tweetText.trim() || isPosting || tweetText.length > MAX_TWEET_LENGTH) return;
 
     setIsPosting(true);
     try {
       const tweetData = {
-        text: tweetText,
+        text: tweetText.trim(),
         userId: user.uid,
         username: user.displayName || user.email?.split('@')[0],
-        userImage: user.photoURL,
+        userImage: getProfileImage(user),
         timestamp: serverTimestamp(),
         likes: 0,
         likedBy: [],
@@ -56,10 +50,8 @@ export default React.memo(function TweetForm() {
     }
   }, [tweetText, user, isPosting]);
 
-  const charLimit = 280;
-  const charCount = tweetText.length;
-  const charRemaining = charLimit - charCount;
-  const isOverLimit = charCount > charLimit;
+  const charRemaining = MAX_TWEET_LENGTH - tweetText.length;
+  const isOverLimit = charRemaining < 0;
 
   return (
     <form onSubmit={handleSubmit} className="px-4 py-4 border-b border-gray-800 hover:bg-gray-900/30 transition-colors">
