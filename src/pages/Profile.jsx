@@ -6,6 +6,8 @@ import { collection, query, where, orderBy, onSnapshot, getDoc, doc, setDoc, ser
 import Tweet from "../components/Tweet";
 import FollowButton from '../components/FollowButton';
 import { useAuth } from '../context/AuthContext';
+import { ReactComponent as AdminIcon } from '../icons/progress-check.svg';
+import { isUserAdmin } from "../firebase";
 
 const DEFAULT_PROFILE_IMAGE = "https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png";
 
@@ -18,6 +20,7 @@ export default function Profile({ currentUser }) {
   const [profileUser, setProfileUser] = useState(null);
   const [activeTab, setActiveTab] = useState('tweets'); // Nueva variable para controlar las pestañas
   const [newPhotoURL, setNewPhotoURL] = useState('');
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const handlePhotoChange = async () => {
     if (!newPhotoURL) return;
@@ -130,6 +133,16 @@ export default function Profile({ currentUser }) {
     };
   }, [userId, currentUser]);
 
+  useEffect(() => {
+    const checkAdmin = async () => {
+      if (profileUser?.uid) {
+        const adminStatus = await isUserAdmin(profileUser.uid);
+        setIsAdmin(adminStatus);
+      }
+    };
+    checkAdmin();
+  }, [profileUser?.uid]);
+
   if (!profileUser) return null;
 
   return (
@@ -154,8 +167,9 @@ export default function Profile({ currentUser }) {
             {/* Nombre y username con botón de seguir */}
             <div className="flex justify-between items-center mb-4">
               <div>
-                <h1 className="text-xl font-bold text-white">
+                <h1 className="text-xl font-bold text-white flex items-center">
                   {profileUser?.displayName || profileUser?.username || profileUser?.email?.split('@')[0]}
+                  {isAdmin && <AdminIcon className="w-4 h-4 text-blue-500 ml-2" />}
                 </h1>
                 <p className="text-gray-500">
                   @{(profileUser?.username || profileUser?.email?.split('@')[0])}_
