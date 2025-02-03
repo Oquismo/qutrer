@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, Suspense } from "react";
 import { formatDistance } from "date-fns";
 import { es } from "date-fns/locale";
 import { useNavigate, Link } from "react-router-dom";
@@ -7,8 +7,10 @@ import { db } from '../firebase';
 import TweetActions from "./TweetActions";
 import FollowButton from './FollowButton';
 import { deleteTweet, isUserAdmin } from "../firebase";
-import { ReactComponent as AdminIcon } from '../icons/progress-check.svg';
 import { useAuth } from '../context/AuthContext';
+
+// Declarar AdminIcon junto a los demás imports
+const AdminIcon = React.lazy(() => import('./AdminIcon'));
 
 const DEFAULT_PROFILE_IMAGE = "https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png";
 
@@ -117,7 +119,11 @@ export default React.memo(function Tweet({ tweet: initialTweet, currentUser, isD
                   {tweet.displayName || tweet.username?.split('@')[0] || 'Usuario'}
                 </span>
               </Link>
-              {isAdmin && <AdminIcon className="w-4 h-4 text-blue-500" />}
+              {isAdmin && (
+                <Suspense fallback={<span>Cargando...</span>}>
+                  <AdminIcon className="w-4 h-4 text-blue-500" />
+                </Suspense>
+              )}
               <span className="text-gray-500">·</span>
               {timestamp && (
                 <span className="text-gray-500 text-sm">

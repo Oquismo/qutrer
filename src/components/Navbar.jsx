@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { Link } from "react-router-dom";
 import { auth, db } from "../firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { useAuth } from "../context/AuthContext";
-import AdminIcon from "./AdminIcon";
+const AdminIcon = React.lazy(() => import('./AdminIcon'));
 
 const DEFAULT_PROFILE_IMAGE = "https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png";
 
@@ -53,7 +53,11 @@ export default function Navbar() {
                   />
                 </div>
                 <span>Mi Perfil</span>
-                {isAdmin && <AdminIcon className="ml-2" />}
+                {isAdmin && (
+                  <Suspense fallback={<span>Cargando...</span>}>
+                    <AdminIcon className="ml-2" />
+                  </Suspense>
+                )}
               </Link>
             )}
           </div>

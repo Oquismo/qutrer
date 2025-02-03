@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
 import Tweet from '../components/Tweet';
-import AdminIcon from '../components/AdminIcon';
 import ProfileImageUploader from '../components/ProfileImageUploader';
 import TweetBox from '../components/TweetBox';
+
+const AdminIcon = React.lazy(() => import('../components/AdminIcon'));
 
 export default function TweetDetail({ currentUser }) {
   const { tweetId } = useParams();
@@ -83,7 +84,11 @@ export default function TweetDetail({ currentUser }) {
             />
           </div>
         )}
-        {currentUser?.isAdmin && <AdminIcon />}
+        {currentUser?.isAdmin && (
+          <Suspense fallback={<div>Cargando...</div>}>
+            <AdminIcon />
+          </Suspense>
+        )}
         {currentUser && <ProfileImageUploader currentUser={currentUser} />}
       </div>
     </div>

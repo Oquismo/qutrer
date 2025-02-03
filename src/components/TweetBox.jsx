@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { db } from '../firebase';
 
@@ -62,3 +63,9 @@ export default function TweetBox({ currentUser, replyTo, placeholder = "¿Qué e
     </div>
   );
 }
+
+TweetBox.propTypes = {
+  currentUser: PropTypes.object.isRequired,
+  replyTo: PropTypes.object,
+  placeholder: PropTypes.string
+};
