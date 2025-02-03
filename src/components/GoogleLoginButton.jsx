@@ -172,19 +172,27 @@ const GoogleLoginButton = () => {
         </button>
       </div>
       {pendingUser && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-[#192734] p-6 rounded-lg w-full max-w-sm">
-            <h2 className="text-white text-xl mb-4">Elige tu nombre de usuario</h2>
-            <input
-              type="text"
-              value={usernameModal}
-              onChange={(e) => setUsernameModal(e.target.value)}
-              placeholder="Nombre de usuario (sin @)"
-              className="w-full p-3 rounded-lg bg-[#15202B] text-white border border-gray-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none mb-4"
-            />
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50">
+          <div className="bg-[#15202B] rounded-lg shadow-lg p-6 w-full max-w-sm mx-4">
+            <h2 className="text-white text-2xl font-semibold mb-4 text-center">
+              Elige tu nombre de usuario
+            </h2>
+            <div className="mb-4">
+              <label htmlFor="usernameModal" className="sr-only">
+                Nombre de usuario
+              </label>
+              <input
+                id="usernameModal"
+                type="text"
+                value={usernameModal}
+                onChange={(e) => setUsernameModal(e.target.value)}
+                placeholder="Nombre de usuario (sin @)"
+                className="w-full px-4 py-3 rounded-lg bg-[#192734] text-white border border-gray-800 focus:border-blue-500 focus:outline-none"
+              />
+            </div>
             <button
               onClick={handleUsernameSubmit}
-              className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition-colors"
+              className="w-full py-3 rounded-full bg-blue-500 hover:bg-blue-600 text-white font-bold transition-colors"
             >
               Guardar
             </button>
