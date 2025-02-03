@@ -9,7 +9,7 @@ Este es un clon de Twitter desarrollado con tecnologías modernas para ofrecer u
 ### 🎨 Frontend:
 - React
 - HTML
-- CSS
+- TailwindCSS
 
 ### 🛠️ Backend:
 - Firebase
