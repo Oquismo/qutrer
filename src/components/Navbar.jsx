@@ -29,17 +29,11 @@ export default function Navbar() {
     fetchUserImage();
   }, [user]);
 
-  // Reemplazar función findUserByUsername para usar fallback a displayName si no existe "username"
+  // Actualiza la función findUserByUsername para que solo busque en "username"
   const findUserByUsername = async (key) => {
     const usersRef = collection(db, "users");
-    let q = query(usersRef, where("username", "==", key));
-    let querySnapshot = await getDocs(q);
-    if (!querySnapshot.empty) {
-      return querySnapshot.docs[0].id;
-    }
-    // Fallback: buscar en displayName
-    q = query(usersRef, where("displayName", "==", key));
-    querySnapshot = await getDocs(q);
+    const q = query(usersRef, where("username", "==", key));
+    const querySnapshot = await getDocs(q);
     if (!querySnapshot.empty) {
       return querySnapshot.docs[0].id;
     }

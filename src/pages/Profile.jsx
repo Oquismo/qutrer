@@ -8,6 +8,8 @@ import FollowButton from '../components/FollowButton';
 import { useAuth } from '../context/AuthContext';
 import { ReactComponent as AdminIcon } from '../icons/progress-check.svg';
 import { isUserAdmin } from "../firebase";
+import UserProfile from '../components/UserProfile';
+import EditProfile from '../components/EditProfile';
 
 const DEFAULT_PROFILE_IMAGE = "https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png";
 
@@ -21,6 +23,7 @@ export default function Profile({ currentUser }) {
   const [activeTab, setActiveTab] = useState('tweets'); // Nueva variable para controlar las pestañas
   const [newPhotoURL, setNewPhotoURL] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
+  const [editMode, setEditMode] = useState(false);
 
   const handlePhotoChange = async () => {
     if (!newPhotoURL) return;
@@ -197,22 +200,20 @@ export default function Profile({ currentUser }) {
               </span>
             </div>
 
-            {/* Cambiar imagen de perfil */}
+            {/* Actualizar UI: remover input y botón para cambiar imagen */}
             {profileUser?.uid === currentUser?.uid && (
-              <div className="flex flex-col items-center">
-                <input
-                  type="text"
-                  placeholder="Nuevo URL de imagen"
-                  value={newPhotoURL}
-                  onChange={(e) => setNewPhotoURL(e.target.value)}
-                  className="w-full p-2 mb-4 rounded bg-gray-800 text-white"
-                />
+              <div className="flex flex-col sm:flex-row gap-4 items-center">
                 <button
-                  onClick={handlePhotoChange}
-                  className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+                  onClick={() => setEditMode(!editMode)}
+                  className="w-full sm:w-auto py-2 px-4 bg-green-500 hover:bg-green-600 text-white font-bold rounded transition-colors"
                 >
-                  Cambiar imagen de perfil
+                  {editMode ? "Cerrar edición" : "Editar perfil"}
                 </button>
+              </div>
+            )}
+            {profileUser?.uid === currentUser?.uid && editMode && (
+              <div className="mt-4">
+                <EditProfile />
               </div>
             )}
           </div>
