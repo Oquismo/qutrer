@@ -71,7 +71,7 @@ export default React.memo(function TweetForm() {
 
   return (
     <form onSubmit={handleSubmit} className="px-4 py-4 border-b border-gray-800 hover:bg-gray-900/30 transition-colors">
-      <div className="flex gap-3">
+      <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative shrink-0">
           <img 
             src={userImage}
@@ -111,7 +111,7 @@ export default React.memo(function TweetForm() {
             </button>
             {image && <img src={image} alt="Previsualización" className="mt-2 w-24 rounded" />}
           </div>
-          <div className="flex items-center justify-end gap-4 pt-3 border-t border-gray-800">
+          <div className="flex flex-col sm:flex-row items-center justify-end gap-4 pt-3 border-t border-gray-800">
             <span className={`text-sm ${isOverLimit ? 'text-red-500' : 'text-gray-500'} transition-colors`}>
               {charRemaining} caracteres restantes
             </span>

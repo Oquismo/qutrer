@@ -150,7 +150,7 @@ export default function Profile({ currentUser }) {
 
   return (
     <div className="min-h-screen bg-[#15202B]">
-      <div className="max-w-2xl mx-auto">
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Cabecera del perfil */}
         <div className="relative">
           {/* Banner */}
@@ -168,9 +168,9 @@ export default function Profile({ currentUser }) {
             </div>
 
             {/* Nombre y username con botón de seguir */}
-            <div className="flex justify-between items-center mb-4">
-              <div>
-                <h1 className="text-xl font-bold text-white flex items-center">
+            <div className="flex flex-col sm:flex-row justify-between items-center mb-4">
+              <div className="text-center sm:text-left">
+                <h1 className="text-xl font-bold text-white flex items-center justify-center sm:justify-start">
                   {profileUser?.displayName || profileUser?.username || profileUser?.email?.split('@')[0]}
                   {isAdmin && <AdminIcon className="w-4 h-4 text-blue-500 ml-2" />}
                 </h1>
@@ -188,7 +188,7 @@ export default function Profile({ currentUser }) {
             </div>
 
             {/* Estadísticas actualizadas */}
-            <div className="flex space-x-6 text-gray-500 mb-4">
+            <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-6 text-gray-500 mb-4">
               <span>
                 <b className="text-white">{userTweets.length}</b> Tweets
               </span>

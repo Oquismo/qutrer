@@ -87,7 +87,7 @@ const GoogleLoginButton = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen w-full bg-[#15202B]">
+    <div className="flex flex-col items-center justify-center min-h-screen w-full bg-[#15202B] px-4 sm:px-6 lg:px-8">
       <div className="auth-container bg-[#15202B] p-8 rounded-lg w-full max-w-md mx-auto">
         <div className="welcome-header flex justify-center w-full">
           <h1 className="text-white text-center text-2xl font-bold my-6">Bienvenido</h1>
