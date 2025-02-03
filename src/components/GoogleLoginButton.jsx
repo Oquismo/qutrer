@@ -11,6 +11,8 @@ const GoogleLoginButton = () => {
   const [username, setUsername] = useState(""); // Nuevo estado
   const [isRegistering, setIsRegistering] = useState(false);
   const [error, setError] = useState(null); // Nuevo estado para mensajes de error
+  const [pendingUser, setPendingUser] = useState(null); // Nuevo estado para usuario pendiente
+  const [usernameModal, setUsernameModal] = useState("");  // Nombre de usuario seleccionado
 
   const handleGoogleLogin = async () => {
     try {
@@ -25,32 +27,41 @@ const GoogleLoginButton = () => {
       const userDoc = await getDoc(userRef);
 
       if (!userDoc.exists()) {
-        // Pedir que el usuario elija un nombre de usuario
-        let chosenUsername = window.prompt(
-          "Elige un nombre de usuario (sin @)",
-          result.user.displayName || result.user.email.split('@')[0]
-        );
-        if (!chosenUsername) {
-          alert("Debes elegir un nombre de usuario para continuar.");
-          setLoading(false);
-          return;
-        }
-        await setDoc(userRef, {
-          uid: result.user.uid,
-          email: result.user.email,
-          displayName: result.user.displayName || result.user.email?.split('@')[0],
-          username: chosenUsername,
-          photoURL: result.user.photoURL,
-          followers: [],
-          following: [],
-          createdAt: serverTimestamp()
-        });
+        // En lugar de window.prompt, guardamos el usuario en estado para mostrar modal
+        setPendingUser(result.user);
+        return;
       }
     } catch (error) {
       console.error("Error al iniciar sesión con Google:", error);
       setError("Fallo al conectar con Google.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Nueva función para enviar el nombre de usuario seleccionado
+  const handleUsernameSubmit = async () => {
+    if (!usernameModal.trim()) {
+      alert("Por favor, ingresa un nombre de usuario.");
+      return;
+    }
+    try {
+      const userRef = doc(db, "users", pendingUser.uid);
+      await setDoc(userRef, {
+        uid: pendingUser.uid,
+        email: pendingUser.email,
+        displayName: pendingUser.displayName || pendingUser.email.split('@')[0],
+        username: usernameModal.trim(),
+        photoURL: pendingUser.photoURL,
+        followers: [],
+        following: [],
+        createdAt: serverTimestamp()
+      });
+      setPendingUser(null);
+      setUsernameModal("");
+    } catch (error) {
+      console.error("Error al guardar el nombre de usuario:", error);
+      setError("Error al guardar el nombre de usuario.");
     }
   };
 
@@ -160,6 +171,26 @@ const GoogleLoginButton = () => {
           {loading ? "Conectando..." : "Continuar con Google"}
         </button>
       </div>
+      {pendingUser && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-[#192734] p-6 rounded-lg w-full max-w-sm">
+            <h2 className="text-white text-xl mb-4">Elige tu nombre de usuario</h2>
+            <input
+              type="text"
+              value={usernameModal}
+              onChange={(e) => setUsernameModal(e.target.value)}
+              placeholder="Nombre de usuario (sin @)"
+              className="w-full p-3 rounded-lg bg-[#15202B] text-white border border-gray-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none mb-4"
+            />
+            <button
+              onClick={handleUsernameSubmit}
+              className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition-colors"
+            >
+              Guardar
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
