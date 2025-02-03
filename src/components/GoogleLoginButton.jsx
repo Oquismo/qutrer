@@ -10,10 +10,12 @@ const GoogleLoginButton = () => {
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState(""); // Nuevo estado
   const [isRegistering, setIsRegistering] = useState(false);
+  const [error, setError] = useState(null); // Nuevo estado para mensajes de error
 
   const handleGoogleLogin = async () => {
     try {
       setLoading(true);
+      setError(null);
       const result = await signInWithPopup(auth, googleProvider);
       console.log("Resultado de autenticación:", result.user); // Para debug
       console.log("Foto de perfil:", result.user.photoURL); // Para debug
@@ -23,10 +25,21 @@ const GoogleLoginButton = () => {
       const userDoc = await getDoc(userRef);
 
       if (!userDoc.exists()) {
+        // Pedir que el usuario elija un nombre de usuario
+        let chosenUsername = window.prompt(
+          "Elige un nombre de usuario (sin @)",
+          result.user.displayName || result.user.email.split('@')[0]
+        );
+        if (!chosenUsername) {
+          alert("Debes elegir un nombre de usuario para continuar.");
+          setLoading(false);
+          return;
+        }
         await setDoc(userRef, {
           uid: result.user.uid,
           email: result.user.email,
           displayName: result.user.displayName || result.user.email?.split('@')[0],
+          username: chosenUsername,
           photoURL: result.user.photoURL,
           followers: [],
           following: [],
@@ -35,6 +48,7 @@ const GoogleLoginButton = () => {
       }
     } catch (error) {
       console.error("Error al iniciar sesión con Google:", error);
+      setError("Fallo al conectar con Google.");
     } finally {
       setLoading(false);
     }
@@ -130,6 +144,8 @@ const GoogleLoginButton = () => {
           <hr className="w-full border-gray-800" />
           <span className="absolute bg-[#15202B] px-4 text-gray-500">o</span>
         </div>
+
+        {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
 
         <button 
           onClick={handleGoogleLogin}

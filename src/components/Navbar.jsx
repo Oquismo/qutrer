@@ -1,6 +1,7 @@
 import React, { useState, useEffect, Suspense } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { auth, db } from "../firebase";
+import { collection, query, where, getDocs } from "firebase/firestore";
 import { doc, getDoc } from "firebase/firestore";
 import { useAuth } from "../context/AuthContext";
 const AdminIcon = React.lazy(() => import('./AdminIcon'));
@@ -10,6 +11,8 @@ const DEFAULT_PROFILE_IMAGE = "https://abs.twimg.com/sticky/default_profile_imag
 export default function Navbar() {
   const { user, isAdmin } = useAuth();
   const [userImage, setUserImage] = useState(DEFAULT_PROFILE_IMAGE);
+  const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUserImage = async () => {
@@ -26,6 +29,41 @@ export default function Navbar() {
     fetchUserImage();
   }, [user]);
 
+  // Reemplazar función findUserByUsername para usar fallback a displayName si no existe "username"
+  const findUserByUsername = async (key) => {
+    const usersRef = collection(db, "users");
+    let q = query(usersRef, where("username", "==", key));
+    let querySnapshot = await getDocs(q);
+    if (!querySnapshot.empty) {
+      return querySnapshot.docs[0].id;
+    }
+    // Fallback: buscar en displayName
+    q = query(usersRef, where("displayName", "==", key));
+    querySnapshot = await getDocs(q);
+    if (!querySnapshot.empty) {
+      return querySnapshot.docs[0].id;
+    }
+    return null;
+  };
+
+  // Función para manejar búsqueda
+  const handleSearch = async (e) => {
+    if (e.key === "Enter" && searchQuery.trim()) {
+      const queryText = searchQuery.trim();
+      if (queryText.startsWith("@")) {
+        const username = queryText.slice(1);
+        const uid = await findUserByUsername(username);
+        if (uid) {
+          navigate(`/profile/${uid}`);
+        } else {
+          alert("Usuario no encontrado");
+        }
+      } else {
+        navigate(`/search?q=${encodeURIComponent(queryText)}`);
+      }
+    }
+  };
+
   return (
     <nav className="sticky top-0 z-50 bg-[#15202B] border-b border-gray-800">
       <div className="max-w-2xl mx-auto">
@@ -37,6 +75,15 @@ export default function Navbar() {
             >
               Inicio
             </Link>
+            {/* Campo de búsqueda */}
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={handleSearch}
+              placeholder="Buscar..."
+              className="px-3 py-1 rounded-full bg-gray-700 text-white outline-none"
+            />
             {user && (
               <Link 
                 to={`/profile/${user.uid}`}

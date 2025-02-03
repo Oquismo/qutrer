@@ -49,7 +49,12 @@ export default function TweetBox({ currentUser, replyTo, placeholder = "¿Qué e
           placeholder={placeholder}
           className="w-full bg-transparent text-white resize-none focus:outline-none"
           rows="3"
+          maxLength="280"
         />
+        {/* Nuevo contador de caracteres */}
+        <div className="text-right text-gray-500 text-sm">
+          {text.length} / 280
+        </div>
         <div className="flex justify-end">
           <button
             type="submit"

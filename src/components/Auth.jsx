@@ -1,20 +1,24 @@
 // src/components/Auth.jsx
 import React, { useState } from "react";
 import { auth, googleProvider } from "../firebase";
-import { signInWithEmailAndPassword, signInWithPopup, createUserWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword, signInWithPopup, createUserWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
 
 export default function Auth() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [resetMessage, setResetMessage] = useState(null);
 
   const handleLogin = async () => {
     if (loading) return;
     setLoading(true);
+    setError(null);
     try {
       await signInWithEmailAndPassword(auth, email, password);
     } catch (error) {
       console.error("Error al iniciar sesión:", error.message);
+      setError("Error al iniciar sesión. Verifica tus credenciales.");
     } finally {
       setLoading(false);
     }
@@ -23,10 +27,12 @@ export default function Auth() {
   const handleSignUp = async () => {
     if (loading) return;
     setLoading(true);
+    setError(null);
     try {
       await createUserWithEmailAndPassword(auth, email, password);
     } catch (error) {
       console.error("Error al registrarse:", error.message);
+      setError("Error al registrarse. Inténtalo de nuevo.");
     } finally {
       setLoading(false);
     }
@@ -35,12 +41,28 @@ export default function Auth() {
   const handleGoogleLogin = async () => {
     if (loading) return;
     setLoading(true);
+    setError(null);
     try {
       await signInWithPopup(auth, googleProvider);
     } catch (error) {
       console.error("Error al iniciar sesión con Google:", error.message);
+      setError("Error al iniciar sesión con Google. Inténtalo de nuevo.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleResetPassword = async () => {
+    if (!email) {
+      alert("Ingresa tu correo electrónico para reiniciar la contraseña.");
+      return;
+    }
+    try {
+      await sendPasswordResetEmail(auth, email);
+      setResetMessage("Correo de reinicio enviado. Revisa tu bandeja.");
+    } catch (error) {
+      console.error("Error en reinicio de contraseña:", error.message);
+      setResetMessage("Error al enviar el correo de reinicio.");
     }
   };
 
@@ -48,6 +70,7 @@ export default function Auth() {
     <div className="flex flex-col items-center justify-center min-h-screen w-full bg-[#15202B]">
       <div className="bg-[#192734] p-8 rounded-lg w-full max-w-md mx-auto">
         <h1 className="text-white text-2xl font-bold mb-6">Iniciar sesión / Registrarse</h1>
+        {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
         <div className="space-y-4">
           <input
             type="email"
@@ -79,6 +102,14 @@ export default function Auth() {
               Registrarse
             </button>
           </div>
+          <button 
+            onClick={handleResetPassword}
+            disabled={loading}
+            className="w-full text-gray-400 hover:text-white text-sm underline transition-colors"
+          >
+            Olvidé mi contraseña
+          </button>
+          {resetMessage && <p className="text-green-500 text-sm">{resetMessage}</p>}
           <button 
             onClick={handleGoogleLogin}
             disabled={loading}

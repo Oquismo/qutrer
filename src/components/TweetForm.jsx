@@ -12,8 +12,10 @@ export default React.memo(function TweetForm() {
   const [tweetText, setTweetText] = useState("");
   const [isPosting, setIsPosting] = useState(false);
   const [userImage, setUserImage] = useState(DEFAULT_PROFILE_IMAGE);
+  const [image, setImage] = useState(null);
   const { user } = useAuth();
   const textareaRef = useRef(null);
+  const fileInputRef = useRef(null); // Nueva referencia
 
   useEffect(() => {
     if (user?.uid) {
@@ -25,7 +27,7 @@ export default React.memo(function TweetForm() {
 
   const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
-    if (!tweetText.trim() || isPosting || tweetText.length > MAX_TWEET_LENGTH) return;
+    if (!tweetText.trim() && !image || isPosting || tweetText.length > MAX_TWEET_LENGTH) return;
 
     setIsPosting(true);
     try {
@@ -39,16 +41,30 @@ export default React.memo(function TweetForm() {
         likedBy: [],
         retweets: 0,
         retweetedBy: [],
+        image: image,
       };
 
       await addDoc(collection(db, "tweets"), tweetData);
       setTweetText("");
+      setImage(null);
     } catch (error) {
       console.error("Error al publicar tweet:", error);
     } finally {
       setIsPosting(false);
     }
-  }, [tweetText, user, isPosting]);
+  }, [tweetText, user, isPosting, image]);
+
+  const handleClear = () => {
+    setTweetText('');
+    setImage(null);
+  };
+
+  const handleImageSelect = (e) => {
+    const file = e.target.files[0];
+    if (file && file.type.startsWith('image/')) {
+      setImage(URL.createObjectURL(file));
+    }
+  };
 
   const charRemaining = MAX_TWEET_LENGTH - tweetText.length;
   const isOverLimit = charRemaining < 0;
@@ -76,7 +92,25 @@ export default React.memo(function TweetForm() {
             rows={1}
             maxLength={280}
           />
-
+          <div>
+            {/* Input oculto */}
+            <input 
+              type="file" 
+              ref={fileInputRef}
+              accept="image/*" 
+              onChange={handleImageSelect} 
+              className="hidden"
+            />
+            {/* Botón personalizado */}
+            <button 
+              type="button" 
+              onClick={() => fileInputRef.current.click()}
+              className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-bold rounded-full transition-colors"
+            >
+              Subir Imagen
+            </button>
+            {image && <img src={image} alt="Previsualización" className="mt-2 w-24 rounded" />}
+          </div>
           <div className="flex items-center justify-end gap-4 pt-3 border-t border-gray-800">
             <span className={`text-sm ${isOverLimit ? 'text-red-500' : 'text-gray-500'} transition-colors`}>
               {charRemaining} caracteres restantes
@@ -100,6 +134,15 @@ export default React.memo(function TweetForm() {
               ) : (
                 "Enviar"
               )}
+            </button>
+            <button 
+              type="button" 
+              onClick={handleClear}
+              className="bg-red-500 hover:bg-red-600 active:bg-red-700 text-white font-bold px-6 py-2.5 rounded-full transition-all duration-200 
+                transform hover:-translate-y-0.5 active:translate-y-0 
+                shadow-lg hover:shadow-red-500/30"
+            >
+              Limpiar
             </button>
           </div>
         </div>

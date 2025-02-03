@@ -80,6 +80,7 @@ export default function FollowButton({ targetUserId, currentUser, size = 'normal
     <button
       onClick={handleFollow}
       disabled={loading}
+      aria-pressed={isFollowing}
       className={`
         ${size === 'small' 
           ? 'px-3 py-1 text-xs' 
