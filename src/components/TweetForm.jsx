@@ -98,7 +98,7 @@ export default React.memo(function TweetForm() {
                   Posteando...
                 </span>
               ) : (
-                "chisme"
+                "Enviar"
               )}
             </button>
           </div>
