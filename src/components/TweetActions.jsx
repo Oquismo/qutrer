@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../firebase';
 import { doc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
+import ShareIcon from './icons/ShareIcon';
 
 export default function TweetActions({ tweet, currentUser }) {
   const [hasLiked, setHasLiked] = useState(false);
@@ -152,10 +153,8 @@ export default function TweetActions({ tweet, currentUser }) {
           handleShare();
         }}
       >
-        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M4 12h16M12 4l8 8-8 8" />
-        </svg>
-        <span>Compartir</span>
+        <ShareIcon />
+        <span className="hidden sm:inline">Compartir</span>
       </button>
     </div>
   );
