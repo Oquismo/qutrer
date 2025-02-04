@@ -2,7 +2,7 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import Slider from '@mui/material/Slider';
 
-export default function ColorSlider() {
+export default function ColorSlider({ width = 300 }) {
   const [brightness, setBrightness] = React.useState(100);
 
   React.useEffect(() => {
@@ -14,7 +14,7 @@ export default function ColorSlider() {
   };
 
   return (
-    <Box sx={{ width: 300 }}>
+    <Box sx={{ width: width }}>
       <Slider
         aria-label="Brillo"
         value={brightness}

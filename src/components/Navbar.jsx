@@ -15,6 +15,7 @@ export default function Navbar() {
   const [userImage, setUserImage] = useState(DEFAULT_PROFILE_IMAGE);
   const [searchQuery, setSearchQuery] = useState("");
   const [brightness, setBrightness] = useState(100);
+  const [showMenu, setShowMenu] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -82,41 +83,59 @@ export default function Navbar() {
               placeholder="Buscar..."
               className="px-3 py-1 rounded-full bg-gray-700 text-white outline-none sm:w-auto w-24"
             />
-            {user && (
-              <Link 
-                to={`/profile/${user.uid}`}
-                className="flex items-center text-gray-200 hover:text-white px-4 py-2 text-base font-medium rounded-full hover:bg-gray-800 transition-colors"
-              >
-                <div className="w-8 h-8 rounded-full overflow-hidden mr-2">
-                  <img 
-                    src={userImage}
-                    alt="Perfil"
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      e.target.src = DEFAULT_PROFILE_IMAGE;
-                    }}
-                  />
-                </div>
-                <span>Mi Perfil</span>
-                {isAdmin && (
-                  <Suspense fallback={<span>Cargando...</span>}>
-                    <AdminIcon className="ml-2" />
-                  </Suspense>
-                )}
-              </Link>
-            )}
           </div>
+
           {user && (
-            <button 
-              onClick={() => auth.signOut()}
-              className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 text-sm font-medium rounded-full transition-colors sm:text-sm text-xs"
-            >
-              Cerrar sesión
-            </button>
+            <div className="relative">
+              <button
+                onClick={() => setShowMenu(!showMenu)}
+                className="flex items-center space-x-2 text-gray-200 hover:text-white p-2 rounded-full hover:bg-gray-800 transition-colors"
+              >
+                <img 
+                  src={userImage}
+                  alt="Perfil"
+                  className="w-8 h-8 rounded-full"
+                  onError={(e) => {
+                    e.target.src = DEFAULT_PROFILE_IMAGE;
+                  }}
+                />
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                </svg>
+              </button>
+
+              {showMenu && (
+                <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-[#192734] ring-1 ring-black ring-opacity-5">
+                  <div className="py-1">
+                    <Link
+                      to={`/profile/${user.uid}`}
+                      className="flex items-center px-4 py-2 text-sm text-gray-200 hover:bg-gray-800"
+                      onClick={() => setShowMenu(false)}
+                    >
+                      Mi Perfil
+                      {isAdmin && (
+                        <Suspense fallback={<span>Cargando...</span>}>
+                          <AdminIcon className="ml-2" />
+                        </Suspense>
+                      )}
+                    </Link>
+                    <div className="px-4 py-2">
+                      <ColorSlider width={150} />
+                    </div>
+                    <button
+                      onClick={() => {
+                        auth.signOut();
+                        setShowMenu(false);
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-gray-800"
+                    >
+                      Cerrar sesión
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           )}
-          <div className="ml-4 hidden sm:block"> 
-            <ColorSlider />
-          </div>
         </div>
       </div>
     </nav>
