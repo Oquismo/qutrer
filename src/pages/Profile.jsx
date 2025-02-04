@@ -167,28 +167,26 @@ export default function Profile({ currentUser }) {
               />
             </div>
 
-            {/* Nombre y username con botón de seguir */}
-            <div className="flex flex-col sm:flex-row justify-between items-center mb-4">
-              <div className="text-center sm:text-left">
-                <h1 className="text-xl font-bold text-white flex items-center justify-center sm:justify-start">
+            {/* Nombre y username (para móviles, se muestra debajo de la foto, alineado a la izquierda) */}
+            <div className="mb-4">
+              <div className="text-left">
+                <h1 className="text-xl font-bold text-white flex items-center">
                   {profileUser?.displayName || profileUser?.username || profileUser?.email?.split('@')[0]}
                   {isAdmin && <AdminIcon className="w-4 h-4 text-blue-500 ml-2" />}
                 </h1>
                 <p className="text-gray-500">
-                  @{(profileUser?.username || profileUser?.email?.split('@')[0])}_
-                  {profileUser?.uid?.slice(-4)}
+                  @{(profileUser?.username || profileUser?.email?.split('@')[0])}_ {profileUser?.uid?.slice(-4)}
                 </p>
               </div>
               {profileUser?.uid !== currentUser?.uid && (
-                <FollowButton
-                  targetUserId={profileUser?.uid}
-                  currentUser={currentUser}
-                />
+                <div className="mt-2">
+                  <FollowButton targetUserId={profileUser?.uid} currentUser={currentUser} />
+                </div>
               )}
             </div>
 
-            {/* Estadísticas actualizadas */}
-            <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-6 text-gray-500 mb-4">
+            {/* Estadísticas actualizadas en fila para móviles */}
+            <div className="flex flex-row justify-around text-gray-500 mb-4">
               <span>
                 <b className="text-white">{userTweets.length}</b> Tweets
               </span>

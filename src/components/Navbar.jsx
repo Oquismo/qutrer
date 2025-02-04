@@ -80,7 +80,7 @@ export default function Navbar() {
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={handleSearch}
               placeholder="Buscar..."
-              className="px-3 py-1 rounded-full bg-gray-700 text-white outline-none"
+              className="px-3 py-1 rounded-full bg-gray-700 text-white outline-none sm:w-auto w-24"
             />
             {user && (
               <Link 
@@ -109,12 +109,12 @@ export default function Navbar() {
           {user && (
             <button 
               onClick={() => auth.signOut()}
-              className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 text-sm font-medium rounded-full transition-colors"
+              className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 text-sm font-medium rounded-full transition-colors sm:text-sm text-xs"
             >
               Cerrar sesión
             </button>
           )}
-          <div className="ml-4"> 
+          <div className="ml-4 hidden sm:block"> 
             <ColorSlider />
           </div>
         </div>

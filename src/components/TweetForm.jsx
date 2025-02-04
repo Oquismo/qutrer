@@ -115,35 +115,37 @@ export default React.memo(function TweetForm() {
             <span className={`text-sm ${isOverLimit ? 'text-red-500' : 'text-gray-500'} transition-colors`}>
               {charRemaining} caracteres restantes
             </span>
-            <button 
-              type="submit" 
-              disabled={isPosting || !tweetText.trim() || isOverLimit}
-              className="bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white font-bold px-6 py-2.5 rounded-full transition-all duration-200 
-                disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-blue-500 
-                transform hover:-translate-y-0.5 active:translate-y-0 
-                shadow-lg hover:shadow-blue-500/30"
-            >
-              {isPosting ? (
-                <span className="flex items-center gap-2">
-                  <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-                  </svg>
-                  Posteando...
-                </span>
-              ) : (
-                "Enviar"
-              )}
-            </button>
-            <button 
-              type="button" 
-              onClick={handleClear}
-              className="bg-red-500 hover:bg-red-600 active:bg-red-700 text-white font-bold px-6 py-2.5 rounded-full transition-all duration-200 
-                transform hover:-translate-y-0.5 active:translate-y-0 
-                shadow-lg hover:shadow-red-500/30"
-            >
-              Limpiar
-            </button>
+            <div className="flex space-x-2 w-full justify-center sm:w-auto sm:justify-end">
+              <button 
+                type="submit" 
+                disabled={isPosting || !tweetText.trim() || isOverLimit}
+                className="bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white font-bold px-6 py-2.5 rounded-full transition-all duration-200 
+                  disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-blue-500 
+                  transform hover:-translate-y-0.5 active:translate-y-0 
+                  shadow-lg hover:shadow-blue-500/30"
+              >
+                {isPosting ? (
+                  <span className="flex items-center gap-2">
+                    <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                    </svg>
+                    Posteando...
+                  </span>
+                ) : (
+                  "Enviar"
+                )}
+              </button>
+              <button 
+                type="button" 
+                onClick={handleClear}
+                className="bg-red-500 hover:bg-red-600 active:bg-red-700 text-white font-bold px-6 py-2.5 rounded-full transition-all duration-200 
+                  transform hover:-translate-y-0.5 active:translate-y-0 
+                  shadow-lg hover:shadow-red-500/30"
+              >
+                Limpiar
+              </button>
+            </div>
           </div>
         </div>
       </div>
