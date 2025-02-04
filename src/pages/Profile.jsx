@@ -252,7 +252,7 @@ export default function Profile({ currentUser }) {
         </div>
 
         {/* Tweet lists */}
-        <div className="border-t border-gray-800">
+        <div>
           {activeTab === 'tweets' ? (
             userTweets.length > 0 ? (
               userTweets.map(tweet => (

@@ -64,7 +64,7 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="sticky top-0 z-50 bg-[#15202B] border-b border-gray-800">
+    <nav className="sticky top-0 z-50 bg-[#15202B] sm:border-b sm:border-gray-800">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-14">
           <div className="flex items-center space-x-4">

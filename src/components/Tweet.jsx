@@ -77,9 +77,7 @@ export default React.memo(function Tweet({ tweet: initialTweet, currentUser, isD
   return (
     <div 
       onClick={handleClick}
-      className={`p-4 border-b border-gray-800 relative ${
-        !isDetail ? 'hover:bg-gray-900/30 cursor-pointer group' : ''
-      } transition-all duration-200`}
+      className={`p-4 ${!isDetail ? 'hover:bg-gray-900/30 cursor-pointer group' : ''} transition-all duration-200`}
       role="article"
     >
       <div className="flex space-x-3">
