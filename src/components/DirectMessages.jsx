@@ -1,13 +1,32 @@
 import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { db } from '../firebase';
-import { collection, query, orderBy, onSnapshot, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, query, orderBy, onSnapshot, addDoc, serverTimestamp, doc, setDoc, increment, getDoc } from 'firebase/firestore';
 import { useAuth } from '../context/AuthContext';
 
-export default function DirectMessages({ targetUserId }) {
+export default function DirectMessages() {
+  const { targetUserId } = useParams();
   const { user: currentUser } = useAuth();
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const convId = [currentUser.uid, targetUserId].sort().join("_");
+
+  // Asegurar que exista el documento de conversación
+  useEffect(() => {
+    const convDocRef = doc(db, "conversations", convId);
+    (async () => {
+      const convSnap = await getDoc(convDocRef);
+      if (!convSnap.exists()) {
+        await setDoc(convDocRef, {
+          participants: [currentUser.uid, targetUserId],
+          lastMessage: "",
+          createdAt: serverTimestamp(),
+          lastUpdated: serverTimestamp(),
+          unread: { [targetUserId]: 0, [currentUser.uid]: 0 }
+        });
+      }
+    })();
+  }, [convId, currentUser.uid, targetUserId]);
 
   useEffect(() => {
     const messagesRef = collection(db, "conversations", convId, "messages");
@@ -28,6 +47,18 @@ export default function DirectMessages({ targetUserId }) {
       senderId: currentUser.uid,
       createdAt: serverTimestamp()
     });
+    // Actualizar documento de conversación y aumentar el contador de mensajes nuevos para el destinatario
+    const convDocRef = doc(db, "conversations", convId);
+    await setDoc(
+      convDocRef,
+      {
+        participants: [currentUser.uid, targetUserId],
+        lastMessage: newMessage.trim(),
+        lastUpdated: serverTimestamp(),
+        unread: { [targetUserId]: increment(1) }
+      },
+      { merge: true }
+    );
     setNewMessage("");
   };
 
