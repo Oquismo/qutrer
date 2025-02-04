@@ -52,6 +52,7 @@ const GoogleLoginButton = () => {
         email: pendingUser.email,
         displayName: pendingUser.displayName || pendingUser.email.split('@')[0],
         username: usernameModal.trim(),
+        usernameLower: usernameModal.trim().toLowerCase(), // <-- Agregado
         photoURL: pendingUser.photoURL,
         followers: [],
         following: [],

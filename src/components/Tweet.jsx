@@ -39,7 +39,7 @@ export default React.memo(function Tweet({ tweet: initialTweet, currentUser, isD
   }, [authUser, tweet.userId]);
 
   React.useEffect(() => {
-    const fetchUserImage = async () => {
+    const fetchUserData = async () => {
       const userRef = doc(db, "users", tweet.userId);
       const userDoc = await getDoc(userRef);
       if (userDoc.exists()) {
@@ -47,11 +47,12 @@ export default React.memo(function Tweet({ tweet: initialTweet, currentUser, isD
         setTweet((prevTweet) => ({
           ...prevTweet,
           userImage: userData.photoURL || DEFAULT_PROFILE_IMAGE,
+          displayName: userData.displayName || prevTweet.displayName,
+          username: userData.username || prevTweet.username
         }));
       }
     };
-
-    fetchUserImage();
+    fetchUserData();
   }, [tweet.userId]);
 
   const handleDelete = React.useCallback(async () => {
@@ -104,7 +105,7 @@ export default React.memo(function Tweet({ tweet: initialTweet, currentUser, isD
                 onClick={(e) => e.stopPropagation()}
               >
                 <span className="font-bold text-white">
-                  {tweet.displayName || tweet.username?.split('@')[0] || 'Usuario'}
+                  {tweet.displayName ? tweet.displayName : tweet.username}
                 </span>
               </Link>
               {isAdmin && (

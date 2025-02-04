@@ -6,6 +6,7 @@ import { useAuth } from "../context/AuthContext";
 export default function EditProfile() {
   const { user, setUser } = useAuth();
   const [username, setUsername] = useState("");
+  const [displayName, setDisplayName] = useState(""); // Nuevo estado para el nombre a mostrar
   const [newPhotoURL, setNewPhotoURL] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
@@ -18,6 +19,7 @@ export default function EditProfile() {
         if (userDoc.exists()) {
           const data = userDoc.data();
           setUsername(data.username || "");
+          setDisplayName(data.displayName || ""); // Inicializar displayName
         }
       }
     };
@@ -35,17 +37,20 @@ export default function EditProfile() {
     setLoading(true);
     try {
       const userRef = doc(db, "users", user.uid);
-      const updates = { username: username.trim() };
+      const updates = { 
+        username: username.trim(),
+        usernameLower: username.trim().toLowerCase(), // <-- Agregado
+        displayName: displayName.trim() 
+      };
       if (newPhotoURL.trim()) {
         updates.photoURL = newPhotoURL.trim();
       }
       await updateDoc(userRef, updates);
       setUser({ ...user, ...updates });
       setMessage("Perfil actualizado correctamente");
-      // Borra el mensaje después de 3 segundos para no mostrar nada cuando no hay error
+      // Borra el mensaje después de 3 segundos
       setTimeout(() => setMessage(""), 3000);
     } catch (error) {
-      // Registra el error solo en desarrollo
       if (process.env.NODE_ENV === "development") {
         console.error("Error actualizando perfil:", error);
       }
@@ -70,6 +75,19 @@ export default function EditProfile() {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             placeholder="Ingrese su nombre de usuario"
+            className="w-full p-2 rounded bg-gray-800 text-white border border-gray-700 focus:outline-none"
+          />
+        </div>
+        <div className="mb-4">
+          <label className="block text-gray-300 mb-1" htmlFor="displayName">
+            Nombre para mostrar
+          </label>
+          <input
+            id="displayName"
+            type="text"
+            value={displayName}
+            onChange={(e) => setDisplayName(e.target.value)}
+            placeholder="Ingrese su nombre"
             className="w-full p-2 rounded bg-gray-800 text-white border border-gray-700 focus:outline-none"
           />
         </div>

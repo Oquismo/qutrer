@@ -39,7 +39,7 @@ export default function Navbar() {
 
   const findUserByUsername = async (key) => {
     const usersRef = collection(db, "users");
-    const q = query(usersRef, where("username", "==", key));
+    const q = query(usersRef, where("usernameLower", "==", key.trim().toLowerCase()));
     const querySnapshot = await getDocs(q);
     if (!querySnapshot.empty) {
       return querySnapshot.docs[0].id;
@@ -56,7 +56,7 @@ export default function Navbar() {
         if (uid) {
           navigate(`/profile/${uid}`);
         } else {
-          alert("Usuario no encontrado");
+          // Handle user not found error
         }
       } else {
         navigate(`/search?q=${encodeURIComponent(queryText)}`);
@@ -75,6 +75,12 @@ export default function Navbar() {
             >
               Inicio
             </Link>
+            <button
+              onClick={() => navigate("/inbox")}
+              className="text-gray-200 hover:text-white px-4 py-2 text-base font-medium rounded-full hover:bg-gray-800 transition-colors"
+            >
+              Mensajes
+            </button>
             <input
               type="text"
               value={searchQuery}

@@ -8,7 +8,8 @@ import Navbar from "./components/Navbar";
 import GoogleLoginButton from "./components/GoogleLoginButton";
 import './styles/index.css';
 import TweetDetail from "./pages/TweetDetail";
-
+import DirectMessages from "./components/DirectMessages"; // Importación para mensajes privados
+import Inbox from "./pages/Inbox"; // <-- Agregar esta línea
 
 
 export default function App() {
@@ -36,6 +37,9 @@ export default function App() {
           <Route path="/profile" element={<Profile currentUser={user} />} />
           <Route path="/profile/:userId" element={<Profile currentUser={user} />} />
           <Route path="/tweet/:tweetId" element={<TweetDetail currentUser={user} />} />
+          {/* Nueva ruta para mensajes privados */}
+          <Route path="/messages/:targetUserId" element={<DirectMessages />} />
+          <Route path="/inbox" element={<Inbox />} /> {/* <-- Agregar esta ruta */}
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </div>

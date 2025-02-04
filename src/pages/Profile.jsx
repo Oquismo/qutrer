@@ -1,6 +1,6 @@
 // src/pages/Profile.jsx
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { db } from "../firebase";
 import { collection, query, where, orderBy, onSnapshot, getDoc, doc, setDoc, serverTimestamp, updateDoc } from "firebase/firestore";
 import Tweet from "../components/Tweet";
@@ -179,8 +179,14 @@ export default function Profile({ currentUser }) {
                 </p>
               </div>
               {profileUser?.uid !== currentUser?.uid && (
-                <div className="mt-2">
+                <div className="mt-2 flex gap-2">
                   <FollowButton targetUserId={profileUser?.uid} currentUser={currentUser} />
+                  <Link
+                    to={`/messages/${profileUser.uid}`}
+                    className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded transition-colors"
+                  >
+                    Mensaje Privado
+                  </Link>
                 </div>
               )}
             </div>
