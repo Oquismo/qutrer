@@ -256,7 +256,9 @@ export default function Profile({ currentUser }) {
           {activeTab === 'tweets' ? (
             userTweets.length > 0 ? (
               userTweets.map(tweet => (
-                <Tweet key={tweet.id} tweet={tweet} currentUser={currentUser} />
+                <div key={tweet.id} className="border-b border-gray-800">
+                  <Tweet tweet={tweet} currentUser={currentUser} />
+                </div>
               ))
             ) : (
               <div className="p-8 text-center text-gray-500">
@@ -266,7 +268,9 @@ export default function Profile({ currentUser }) {
           ) : activeTab === 'retweets' ? (
             retweetedTweets.length > 0 ? (
               retweetedTweets.map(tweet => (
-                <Tweet key={tweet.id} tweet={tweet} currentUser={currentUser} />
+                <div key={tweet.id} className="border-b border-gray-800">
+                  <Tweet tweet={tweet} currentUser={currentUser} />
+                </div>
               ))
             ) : (
               <div className="p-8 text-center text-gray-500">
@@ -276,7 +280,9 @@ export default function Profile({ currentUser }) {
           ) : (
             likedTweets.length > 0 ? (
               likedTweets.map(tweet => (
-                <Tweet key={tweet.id} tweet={tweet} currentUser={currentUser} />
+                <div key={tweet.id} className="border-b border-gray-800">
+                  <Tweet tweet={tweet} currentUser={currentUser} />
+                </div>
               ))
             ) : (
               <div className="p-8 text-center text-gray-500">
