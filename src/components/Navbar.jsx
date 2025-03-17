@@ -9,7 +9,7 @@ import ColorSlider from "./ColorSlider"; // Asegúrate de que esta importación 
 const AdminIcon = React.lazy(() => import('./AdminIcon'));
 
 const DEFAULT_PROFILE_IMAGE = "https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png";
-
+const PrevLogo = require('../components/img/prevlogo3.png')
 export default function Navbar() {
   const { user, isAdmin } = useAuth();
   const [userImage, setUserImage] = useState(DEFAULT_PROFILE_IMAGE);
@@ -89,6 +89,7 @@ export default function Navbar() {
               placeholder="Buscar..."
               className="px-3 py-1 rounded-full bg-gray-700 text-white outline-none sm:w-auto w-24"
             />
+            <img src={PrevLogo} alt="Logo" className="h-10" /> {/* Ajustar tamaño con Tailwind */}
           </div>
 
           {user && (
