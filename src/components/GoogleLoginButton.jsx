@@ -13,6 +13,8 @@ const GoogleLoginButton = () => {
   const [error, setError] = useState(null); // Nuevo estado para mensajes de error
   const [pendingUser, setPendingUser] = useState(null); // Nuevo estado para usuario pendiente
   const [usernameModal, setUsernameModal] = useState("");  // Nombre de usuario seleccionado
+  const [usernameError, setUsernameError] = useState("");
+  const [usernameSuggestions, setUsernameSuggestions] = useState([]);
 
   const handleGoogleLogin = async () => {
     try {
@@ -39,12 +41,34 @@ const GoogleLoginButton = () => {
     }
   };
 
+  const generateUsernameSuggestions = (baseUsername) => {
+    const suggestions = [];
+    suggestions.push(`${baseUsername}${Math.floor(Math.random() * 100)}`);
+    suggestions.push(`${baseUsername}_alt`);
+    setUsernameSuggestions(suggestions);
+  };
+
   // Nueva función para enviar el nombre de usuario seleccionado
   const handleUsernameSubmit = async () => {
     if (!usernameModal.trim()) {
-      alert("Por favor, ingresa un nombre de usuario.");
+      setUsernameError("Por favor, ingresa un nombre de usuario.");
       return;
     }
+
+    // Validar longitud del nombre de usuario
+    if (usernameModal.length < 3 || usernameModal.length > 15) {
+      setUsernameError("El nombre de usuario debe tener entre 3 y 15 caracteres.");
+      return;
+    }
+
+    // Validar caracteres alfanuméricos
+    const usernameRegex = /^[a-zA-Z0-9_]+$/;
+    if (!usernameRegex.test(usernameModal)) {
+      setUsernameError("El nombre de usuario solo puede contener letras, números y guiones bajos.");
+      return;
+    }
+
+    setUsernameError(""); // Clear any previous errors
     try {
       const userRef = doc(db, "users", pendingUser.uid);
       await setDoc(userRef, {
@@ -60,6 +84,8 @@ const GoogleLoginButton = () => {
       });
       setPendingUser(null);
       setUsernameModal("");
+      // Redirigir al usuario a la página principal
+      window.location.href = "/";
     } catch (error) {
       console.error("Error al guardar el nombre de usuario:", error);
       setError("Error al guardar el nombre de usuario.");
@@ -86,11 +112,13 @@ const GoogleLoginButton = () => {
       setLoading(false);
     }
   };
+  const PrevLogo = require('../components/img/prevlogo3.png')
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen w-full bg-[#15202B] px-4 sm:px-6 lg:px-8">
       <div className="auth-container bg-[#15202B] p-8 rounded-lg w-full max-w-md mx-auto">
-        <div className="welcome-header flex justify-center w-full">
+        <div className="welcome-header flex flex-col items-center w-full">
+          <img src={PrevLogo} alt="Logo" className="w-32 h-auto mb-4" /> {/* Ajustar tamaño con Tailwind */}
           <h1 className="text-white text-center text-2xl font-bold my-6">Bienvenido</h1>
         </div>
 
@@ -178,6 +206,14 @@ const GoogleLoginButton = () => {
             <h2 className="text-white text-2xl font-semibold mb-4 text-center">
               Elige tu nombre de usuario
             </h2>
+            {/* Mostrar foto de perfil de Google */}
+            {pendingUser.photoURL && (
+              <img
+                src={pendingUser.photoURL}
+                alt="Google Profile"
+                className="w-16 h-16 rounded-full mx-auto mb-4"
+              />
+            )}
             <div className="mb-4">
               <label htmlFor="usernameModal" className="sr-only">
                 Nombre de usuario
@@ -186,11 +222,34 @@ const GoogleLoginButton = () => {
                 id="usernameModal"
                 type="text"
                 value={usernameModal}
-                onChange={(e) => setUsernameModal(e.target.value)}
+                onChange={(e) => {
+                  setUsernameModal(e.target.value);
+                  setUsernameError(""); // Clear error when typing
+                  if (pendingUser) {
+                    generateUsernameSuggestions(e.target.value); // Generar sugerencias
+                  }
+                }}
                 placeholder="Nombre de usuario (sin @)"
-                className="w-full px-4 py-3 rounded-lg bg-[#192734] text-white border border-gray-800 focus:border-blue-500 focus:outline-none"
+                className={`w-full px-4 py-3 rounded-lg bg-[#192734] text-white border border-gray-800 focus:border-blue-500 focus:outline-none ${usernameError ? 'border-red-500' : ''}`}
               />
+              {usernameError && <p className="text-red-500 text-sm mt-1">{usernameError}</p>}
             </div>
+            {usernameSuggestions.length > 0 && (
+              <div className="mt-2">
+                <p className="text-gray-400 text-sm">Sugerencias:</p>
+                <div className="flex gap-2">
+                  {usernameSuggestions.map((suggestion) => (
+                    <button
+                      key={suggestion}
+                      onClick={() => setUsernameModal(suggestion)}
+                      className="bg-gray-700 text-white text-xs py-1 px-2 rounded-full hover:bg-gray-600"
+                    >
+                      {suggestion}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
             <button
               onClick={handleUsernameSubmit}
               className="w-full py-3 rounded-full bg-blue-500 hover:bg-blue-600 text-white font-bold transition-colors"
