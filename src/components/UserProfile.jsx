@@ -13,47 +13,79 @@ const UserProfile = () => {
   const [userTweets, setUserTweets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { user, isAdmin } = useAuth();
-  const [isAdminUser, setIsAdminUser] = useState(false);
+  const { authUser: user, isAdmin: currentIsAdmin, profile: currentUserProfile } = useAuth(); // Updated useAuth
+  const [isProfileAdmin, setIsProfileAdmin] = useState(false); // Renamed to avoid confusion with logged-in user's admin status
 
   useEffect(() => {
     const fetchUserProfile = async () => {
       if (!userId) return;
+      setLoading(true);
+      setError(null);
+      setUserProfile(null); // Reset profile state on new userId
+      setUserTweets([]);    // Reset tweets state on new userId
 
       try {
-        console.log('Buscando perfil para userId:', userId);
+        console.log('Fetching profile for userId:', userId);
 
-        // Primero, buscar en la colección de tweets para obtener la información del usuario
+        // 1. Fetch user data from 'users' collection
+        const userDocRef = doc(db, 'users', userId);
+        const userDocSnap = await getDoc(userDocRef);
+        let profileData = null;
+
+        if (userDocSnap.exists()) {
+          const userData = userDocSnap.data();
+          profileData = {
+            displayName: userData.displayName || userData.username,
+            photoURL: userData.photoURL,
+            userId: userId, // Use userId from params
+            username: userData.username || (userData.email ? userData.email.split('@')[0] : userId) // Ensure username is populated for display
+          };
+          console.log('Profile data from users collection:', profileData);
+        } else {
+          console.warn(`User document not found in 'users' collection for uid: ${userId}.`);
+        }
+
+        // 2. Fetch user's tweets
         const tweetsQuery = query(
           collection(db, 'tweets'),
           where('userId', '==', userId),
           orderBy('timestamp', 'desc')
         );
-        
         const tweetsSnapshot = await getDocs(tweetsQuery);
-        const tweets = tweetsSnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
+        const tweets = tweetsSnapshot.docs.map(tweetDoc => ({
+          id: tweetDoc.id,
+          ...tweetDoc.data()
         }));
-        
-        console.log('Tweets encontrados:', tweets.length);
+        setUserTweets(tweets);
+        console.log('Tweets found:', tweets.length);
 
-        if (tweets.length > 0) {
-          const userInfo = tweets[0];
-          setUserProfile({
-            displayName: userInfo.username,
-            photoURL: userInfo.userImage,
-            userId: userInfo.userId
-          });
-          setUserTweets(tweets);
+        // 3. Consolidate profile data
+        // If profileData came from 'users', it's preferred.
+        // If not, and tweets exist, use info from the first tweet as a fallback.
+        if (profileData) {
+          setUserProfile(profileData);
+        } else if (tweets.length > 0) {
+          const tweetUserInfo = tweets[0]; // Assuming first tweet has representative user info
+          const fallbackProfileData = {
+            displayName: tweetUserInfo.username,
+            photoURL: tweetUserInfo.userImage,
+            userId: tweetUserInfo.userId, // This should match userId from params
+            username: tweetUserInfo.username // Use username from tweet
+          };
+          setUserProfile(fallbackProfileData);
+          console.warn('Used fallback profile data from tweets:', fallbackProfileData);
+        } else {
+          console.log('No profile data found for user in users collection or tweets:', userId);
+          // setError("Usuario no encontrado o sin datos de perfil."); // Handled by !userProfile check later
         }
 
-        const adminDoc = await getDoc(doc(db, 'admins', userId));
-        setIsAdminUser(adminDoc.exists());
+        // 4. Check if the profile being viewed is an admin
+        const profileAdminDoc = await getDoc(doc(db, 'admins', userId));
+        setIsProfileAdmin(profileAdminDoc.exists());
 
-      } catch (error) {
-        console.error('Error al obtener el perfil:', error);
-        setError("Error al cargar el perfil");
+      } catch (err) {
+        console.error('Error fetching profile:', err);
+        setError("Error al cargar el perfil.");
       } finally {
         setLoading(false);
       }
@@ -130,11 +162,21 @@ const UserProfile = () => {
               className="text-white"
             />
           )}
-          <div>
-            <h2 className="text-xl font-bold">
-              {userProfile.displayName || userProfile.email?.split('@')[0]} {isAdminUser && <AdminIcon className="w-4 h-4 text-blue-500 ml-2" />}
-            </h2>
+          <div className="flex-grow">
+            <div className="flex items-center gap-2">
+              <h2 className="text-xl font-bold">
+                {userProfile.displayName || userProfile.email?.split('@')[0]} {isProfileAdmin && <AdminIcon className="w-4 h-4 text-blue-500 ml-1 inline-block" />}
+              </h2>
+            </div>
             <p className="text-gray-400">@{userProfile.username?.split('@')[0] || userProfile.displayName?.split('@')[0]}</p>
+            {user && user.uid !== userId && (
+              <button
+                onClick={() => navigate(`/messages/${userId}`)}
+                className="mt-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full text-sm transition-colors"
+              >
+                Enviar Mensaje
+              </button>
+            )}
           </div>
         </div>
       </div>
