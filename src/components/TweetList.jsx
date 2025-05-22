@@ -1,6 +1,6 @@
 // src/components/TweetList.jsx
 import React, { useEffect, useState, useCallback } from "react";
-import { collection, query, onSnapshot, orderBy, limit } from "firebase/firestore";
+import { collection, query, onSnapshot, orderBy, limit, where } from "firebase/firestore"; // Importar where
 import { db } from "../firebase";
 import Tweet from "./Tweet";
 
@@ -13,6 +13,7 @@ export default React.memo(function TweetList({ currentUser }) {
   useEffect(() => {
     const q = query(
       collection(db, "tweets"), 
+      where("isReply", "!=", true), // Solo tweets que no son respuestas
       orderBy("timestamp", "desc"),
       limit(TWEETS_PER_PAGE)
     );

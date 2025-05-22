@@ -2,6 +2,8 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
+import { ThemeProvider } from "./context/ThemeContext";
+import { NotificationProvider } from "./context/NotificationContext"; // Importar NotificationProvider
 import Home from "./pages/Home";
 import Profile from "./pages/Profile";
 import Navbar from "./components/Navbar";
@@ -19,30 +21,34 @@ export default function App() {
     return <div>Cargando...</div>;
   }
 
-  if (!user) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-        
-        <GoogleLoginButton />
-      </div>
-    );
-  }
-
   return (
-    <Router>
-      <div className="min-h-screen bg-gray-50">
-        <Navbar user={user} />
-        <Routes>
-          <Route path="/" element={<Home user={user} />} />
-          <Route path="/profile" element={<Profile currentUser={user} />} />
-          <Route path="/profile/:userId" element={<Profile currentUser={user} />} />
-          <Route path="/tweet/:tweetId" element={<TweetDetail currentUser={user} />} />
-          {/* Nueva ruta para mensajes privados */}
-          <Route path="/messages/:targetUserId" element={<DirectMessages />} />
-          <Route path="/inbox" element={<Inbox />} /> {/* <-- Agregar esta ruta */}
-          <Route path="*" element={<Navigate to="/" />} />
-        </Routes>
-      </div>
-    </Router>
+    <ThemeProvider>
+      <NotificationProvider>
+        <Router>
+          <div className="min-h-screen bg-gray-50 dark:bg-slate-900 dark:text-white">
+            {user && <Navbar user={user} />}
+            <Routes>
+              {!user ? (
+                <Route path="/login" element={
+                  <div className="flex flex-col items-center justify-center min-h-screen">
+                    <GoogleLoginButton />
+                  </div>
+                } />
+              ) : (
+                <>
+                  <Route path="/" element={<Home user={user} />} />
+                  <Route path="/profile" element={<Profile currentUser={user} />} />
+                  <Route path="/profile/:userId" element={<Profile currentUser={user} />} />
+                  <Route path="/tweet/:tweetId" element={<TweetDetail currentUser={user} />} />
+                  <Route path="/messages/:targetUserId" element={<DirectMessages />} />
+                  <Route path="/inbox" element={<Inbox />} />
+                </>
+              )}
+              <Route path="*" element={<Navigate to={user ? "/" : "/login"} />} />
+            </Routes>
+          </div>
+        </Router>
+      </NotificationProvider>
+    </ThemeProvider>
   );
 }

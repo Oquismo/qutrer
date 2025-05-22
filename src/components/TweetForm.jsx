@@ -9,11 +9,32 @@ const MAX_TWEET_LENGTH = 280;
 const DEFAULT_PROFILE_IMAGE = "https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png";
 
 export default React.memo(function TweetForm() {
+  const { user } = useAuth();
   const [tweetText, setTweetText] = useState("");
   const [isPosting, setIsPosting] = useState(false);
   const [userImage, setUserImage] = useState(DEFAULT_PROFILE_IMAGE);
   const [image, setImage] = useState(null);
-  const { user } = useAuth();
+  // Cargar borrador de localStorage
+  useEffect(() => {
+    if (user?.uid) {
+      const draft = localStorage.getItem(`tweetDraft-${user.uid}`);
+      if (draft) {
+        const { text, img } = JSON.parse(draft);
+        setTweetText(text);
+        setImage(img);
+      }
+    }
+  }, [user]);
+  // Guardar borrador en localStorage
+  useEffect(() => {
+    if (user?.uid) {
+      localStorage.setItem(
+        `tweetDraft-${user.uid}`,
+        JSON.stringify({ text: tweetText, img: image })
+      );
+    }
+  }, [tweetText, image, user]);
+
   const textareaRef = useRef(null);
   const fileInputRef = useRef(null); // Nueva referencia
 
@@ -42,9 +63,12 @@ export default React.memo(function TweetForm() {
         retweets: 0,
         retweetedBy: [],
         image: image,
+        isReply: false, // <-- AÑADIDO: Marcar explícitamente que no es una respuesta
       };
 
       await addDoc(collection(db, "tweets"), tweetData);
+      // Limpiar borrador al publicar
+      localStorage.removeItem(`tweetDraft-${user.uid}`);
       setTweetText("");
       setImage(null);
     } catch (error) {
@@ -57,6 +81,8 @@ export default React.memo(function TweetForm() {
   const handleClear = () => {
     setTweetText('');
     setImage(null);
+    // Borrar borrador al limpiar manualmente
+    user?.uid && localStorage.removeItem(`tweetDraft-${user.uid}`);
   };
 
   const handleImageSelect = (e) => {

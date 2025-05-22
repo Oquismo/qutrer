@@ -4,22 +4,26 @@
 
 /* Estilos base para toda la aplicación */
 body {
+  @apply bg-light-background text-light-text dark:bg-dark-background dark:text-dark-text;
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #15202B;
-  color: #e7e9ea;
 }
 
 #root {
   min-height: 100vh;
-  background-color: #15202B;
+  /* El color de fondo se maneja en App.js o body ahora */
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+/* Clases adicionales que podrías querer definir para componentes específicos */
+.card {
+  @apply bg-light-card dark:bg-dark-card border border-light-border dark:border-dark-border;
 }

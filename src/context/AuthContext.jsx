@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState, useMemo } from 'react';
-import { auth, db } from '../firebase';
+import { auth, isUserAdmin, db } from '../firebase';
 import { onAuthStateChanged, updateProfile } from 'firebase/auth';
 import { doc, setDoc, getDoc, serverTimestamp, updateDoc } from 'firebase/firestore';
 
@@ -50,8 +50,8 @@ export function AuthProvider({ children }) {
           }
 
           // Verificar si el usuario es administrador
-          const adminDoc = await getDoc(doc(db, "admins", authUser.uid));
-          setIsAdmin(adminDoc.exists());
+          const admin = await isUserAdmin(authUser.uid);
+          setIsAdmin(admin);
         } catch (error) {
           console.error("Error initializing user:", error);
           setUser(authUser);

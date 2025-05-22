@@ -1,11 +1,12 @@
 // src/components/Auth.jsx
 import React, { useState } from "react";
-import { auth, googleProvider } from "../firebase";
-import { signInWithEmailAndPassword, signInWithPopup, createUserWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
+import { auth, googleProvider, registerWithEmailAndPassword, loginWithEmailAndPassword } from "../firebase";
+import { signInWithPopup, sendPasswordResetEmail } from "firebase/auth";
 
 export default function Auth() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("");
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [resetMessage, setResetMessage] = useState(null);
@@ -15,7 +16,7 @@ export default function Auth() {
     setLoading(true);
     setError(null);
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      await loginWithEmailAndPassword(email, password);
     } catch (error) {
       console.error("Error al iniciar sesión:", error.message);
       setError("Error al iniciar sesión. Verifica tus credenciales.");
@@ -29,7 +30,7 @@ export default function Auth() {
     setLoading(true);
     setError(null);
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      await registerWithEmailAndPassword(email, password, username);
     } catch (error) {
       console.error("Error al registrarse:", error.message);
       setError("Error al registrarse. Inténtalo de nuevo.");
@@ -72,6 +73,14 @@ export default function Auth() {
         <h1 className="text-white text-2xl font-bold mb-6">Iniciar sesión / Registrarse</h1>
         {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
         <div className="space-y-4">
+          {/* Campo de nombre de usuario para registro */}
+          <input
+            type="text"
+            placeholder="Nombre de usuario"
+            className="w-full p-3 rounded-lg bg-[#15202B] text-white border border-gray-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
           <input
             type="email"
             placeholder="Email"
